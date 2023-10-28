@@ -13,12 +13,20 @@ const urlDatabase = {
 //id is brought up often in project 
 // create a resuable object id 
 // needs to be inside the route handler or an ref error will occur 
+
+app.get("/urls/:id", (req, res) => {
+  const templateVars = { 
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id] };
+  res.render("urls_show", templateVars);
+});
+
 app.get("urlDatabase: id", (req, res) => {
-  const { id } = {
+  const templateVars = {
     id : req.params.id, 
-    longURL : urlDatabase[req.params.id] //access values in URL Database
-  }
-})
+    longURL : urlDatabase[req.params.id] };
+    res.render("urls_index", templateVars);
+});
 
 app.get("/urls", (req, res) => { 
   const templateVars = { urls: urlDatabase };
