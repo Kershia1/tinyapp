@@ -28,10 +28,10 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let id in urls) { %>
+          <% for (let shortURL in urls) { %>
             <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
+              <td><a href= "<%= shortURL %>"></a> <%= shortURL %> </a></td>
+              <td><a href= "<%= urls[shortURL]" %>"><%= urls[shortURL] %> </a></td>
             </tr>
           <% } %>
         </tbody>
