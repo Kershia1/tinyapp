@@ -6,6 +6,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
+//url Database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -13,21 +14,28 @@ const urlDatabase = {
 //http://localhost:8080/urls/b2xVn2 works!
 //http://localhost:8080/urls/new
 
+//Handler for post req to update a urlDatabase in database
+app.post('urls/:id', (req, res) => {
+  const longURL = req.body.newLongURL; //
+  const shortURL = req.params.id; // setting params to get short url
+  urlDatabase[shortURL] = longURL; //store in database
+  res.redirect('/urls'); // back to urls 
+});
+
+//Handler for post req to create a new shortURL, then add to database
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString(6); // make random alphanumeric string.
   urlDatabase[shortURL] = req.body.longURL; //longURl to add to database
-  res.redirect('/urls/${shortURL}'); //newly created shortURL page 
-})
-
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${shortURL}`); //newly created shortURL page 
+  // res.status(200).send("Added URL: " + req.body.longURL)
 });
 
+//render new urls page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//render the 'urls_show' page to display a specific URL
 app.get("/urls/:id", (req, res) => {
   const templateVars = { 
     id: req.params.id,
@@ -35,40 +43,39 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("urlDatabase: id", (req, res) => {
-  const templateVars = {
-    id : req.params.id, 
-    longURL : urlDatabase[req.params.id] };
-    res.render("urls_index", templateVars);
+//Redirection from short url alias to long url
+app.get("/u/:id", (req, res) => {
+  // const longURL = ...
+  res.redirect(longURL);
 });
 
+//render urls index page to display all urls in database
 app.get("/urls", (req, res) => { 
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars); //render in urls_index.ejs
 }); 
 
+//Basic welcome message done with HTML
 app.get("/hello", (req, res) => {
   res.send("<html><body><b>Welcome !</b></body></html>\n");
 }); // Welcome ! in bold text
 
-// app.get("/", (req, res) => { // handler is on root path
-//   res.send("Hello!");
-// });
-
-//route to /views/index.ejs 
+//route to render index 
 app.get('/index', (req, res) => {
   res.render('index'); //render index
 });
 
-//route to /views/about.ejs 
+//route to render about
 app.get('about', (req, res) => {
   res.render('pages/about'); //render about
 });
 
+// sends a response with the url database sent as a json file 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 }); // JSON String => returns urlDatabase object at that point in time 
 
+//self explanitory
 function generateRandomString(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let randomString = "";
@@ -82,6 +89,7 @@ function generateRandomString(length) {
 
 const randomString = generateRandomString(6);
 
+//port I am listening on 8080, generated after starting Express App
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
