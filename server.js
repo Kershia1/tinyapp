@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+app.use(express.urlencoded({ extended: true }));
+
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -10,11 +12,17 @@ const urlDatabase = {
 };
 //http://localhost:8080/urls/b2xVn2 works!
 //http://localhost:8080/urls/new
-// create an object to access the value of the shortened URL Key
-//id is brought up often in project 
-// create a resuable object id 
-// needs to be inside the route handler or an ref error will occur 
-//A good rule of thumb to follow is that routes should be ordered from most specific to least specific.
+
+app.post('/urls', (req, res) => {
+  const shortURL = generateRandomString(6); // make random alphanumeric string.
+  urlDatabase[shortURL] = req.body.longURL; //longURl to add to database
+  res.redirect('/urls/${shortURL}'); //newly created shortURL page 
+})
+
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -60,6 +68,19 @@ app.get('about', (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 }); // JSON String => returns urlDatabase object at that point in time 
+
+function generateRandomString(length) {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomString = "";
+
+  for(let i = 0; i < length; i++) {
+    const randoString = Math.floor(Math.random() * characters.length);
+    randomString += characters[randoString];
+  }
+  return randomString;
+}
+
+const randomString = generateRandomString(6);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
