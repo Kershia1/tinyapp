@@ -8,11 +8,17 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
+//http://localhost:8080/urls/b2xVn2 works!
+//http://localhost:8080/urls/new
 // create an object to access the value of the shortened URL Key
 //id is brought up often in project 
 // create a resuable object id 
 // needs to be inside the route handler or an ref error will occur 
+//A good rule of thumb to follow is that routes should be ordered from most specific to least specific.
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { 
