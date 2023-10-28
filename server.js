@@ -12,15 +12,17 @@ const urlDatabase = {
 // create an object to access the value of the shortened URL Key
 //id is brought up often in project 
 // create a resuable object id 
+// needs to be inside the route handler or an ref error will occur 
+app.get("urlDatabase: id", (req, res) => {
+  const { id } = {
+    id : req.params.id, 
+    longURL : urlDatabase[req.params.id] //access values in URL Database
+  }
+})
 
-const { id } = {
-  id : req.params.id, 
-  longURL : urlDatabase[req.params.id] //access values in URL Database
-}
-
-app.get("/urls", (req, res) => {
+app.get("/urls", (req, res) => { 
   const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+  res.render("urls_index", templateVars); //render in urls_index.ejs
 }); 
 
 app.get("/hello", (req, res) => {
