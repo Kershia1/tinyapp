@@ -9,6 +9,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// create an object to access the value of the shortened URL Key
+//id is brought up often in project 
+// create a resuable object id 
+
+const { id } = {
+  id : req.params.id, 
+  longURL : urlDatabase[req.params.id] //access values in URL Database
+}
+
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+}); 
+
 app.get("/hello", (req, res) => {
   res.send("<html><body><b>Welcome !</b></body></html>\n");
 }); // Welcome ! in bold text
