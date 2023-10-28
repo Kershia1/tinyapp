@@ -10,11 +10,21 @@ const urlDatabase = {
 };
 
 app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-}); // Hello World World is BOLD txt
+  res.send("<html><body><b>Welcome !</b></body></html>\n");
+}); // Welcome ! in bold text
 
-app.get("/", (req, res) => { // handler is on root path
-  res.send("Hello!");
+// app.get("/", (req, res) => { // handler is on root path
+//   res.send("Hello!");
+// });
+
+//route to /views/index.ejs 
+app.get('/index', (req, res) => {
+  res.render('index'); //render index
+});
+
+//route to /views/about.ejs 
+app.get('about', (req, res) => {
+  res.render('pages/about'); //render about
 });
 
 app.get("/urls.json", (req, res) => {
