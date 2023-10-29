@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "./node_modules/.bin/nodemon -L server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -11,7 +12,7 @@
     "url": "git+https://github.com/Kershia1/tinyapp.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "[Desiree Ingram, insatiable.meerkat@gmail.com]",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Kershia1/tinyapp/issues"
@@ -20,5 +21,8 @@
   "dependencies": {
     "ejs": "^3.1.9",
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

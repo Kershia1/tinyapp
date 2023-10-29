@@ -13,6 +13,8 @@ const urlDatabase = {
 };
 //http://localhost:8080/urls/b2xVn2 works!
 //http://localhost:8080/urls/new
+//script to run nodemon ./node_modules/.bin/nodemon -L server.js
+//-L flag due to a shared file sys i.e. vagrant
 
 //Handler for post req to update a urlDatabase in database
 app.post('urls/:id', (req, res) => {
