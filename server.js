@@ -44,9 +44,14 @@ app.get("/urls/:id", (req, res) => {
 });
 
 //Redirection from short url alias to long url
+// potential for error handeling?
 app.get("/u/:id", (req, res) => {
-  // const longURL = ...
-  res.redirect(longURL);
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
+  if(longURL){
+    res.redirect(longURL);
+  }else res.status(404); {
+  }
 });
 
 //render urls index page to display all urls in database
