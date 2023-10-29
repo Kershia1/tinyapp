@@ -16,7 +16,7 @@ const urlDatabase = {
 
 //Handler for post req to update a urlDatabase in database
 app.post('urls/:id', (req, res) => {
-  const longURL = req.body.newLongURL; //
+  const longURL = req.body.newLongURL; //adding new long URL
   const shortURL = req.params.id; // setting params to get short url
   urlDatabase[shortURL] = longURL; //store in database
   res.redirect('/urls'); // back to urls 
@@ -50,7 +50,7 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[shortURL];
   if(longURL){
     res.redirect(longURL);
-  }else res.status(404); {
+  } else res.status(404); {
   }
 });
 
