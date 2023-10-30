@@ -57,6 +57,17 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//retrieve  a specific URL to Edit on the urls_shows pg
+app.post("/urls/:id", (req, res) => {
+  const editURL = req.body.longURL;
+  if(urlDatabase[editURL]) {
+  res.redirect('/urls');
+  } else {
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+  }
+});
+
+
 //Redirection from short url alias to long url
 // potential for error handeling?
 app.get("/u/:id", (req, res) => {
