@@ -32,6 +32,15 @@ app.post('/urls', (req, res) => {
   // res.status(200).send("Added URL: " + req.body.longURL)
 });
 
+app.post('/urls/:id/delete', (req, res) => {
+  const deleteURL = req.params.shortURL;
+  if (urlDatabase[deleteURL]) {
+    delete urlDatabase[deleteURL];
+  }
+  //redirect back to urls
+  res.redirect('/urls');
+});
+
 //render new urls page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -39,9 +48,10 @@ app.get("/urls/new", (req, res) => {
 
 //render the 'urls_show' page to display a specific URL
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id] };
+    longURL: urlDatabase[req.params.id]
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -50,17 +60,17 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
-  if(longURL){
+  if (longURL) {
     res.redirect(longURL);
   } else res.status(404); {
   }
 });
 
 //render urls index page to display all urls in database
-app.get("/urls", (req, res) => { 
+app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars); //render in urls_index.ejs
-}); 
+});
 
 //Basic welcome message done with HTML
 app.get("/hello", (req, res) => {
@@ -87,7 +97,7 @@ function generateRandomString(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let randomString = "";
 
-  for(let i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     const randoString = Math.floor(Math.random() * characters.length);
     randomString += characters[randoString];
   }
