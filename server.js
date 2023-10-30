@@ -32,13 +32,15 @@ app.post('/urls', (req, res) => {
   // res.status(200).send("Added URL: " + req.body.longURL)
 });
 
+//delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
   const deleteURL = req.params.shortURL;
   if (urlDatabase[deleteURL]) {
     delete urlDatabase[deleteURL];
-  }
-  //redirect back to urls
   res.redirect('/urls');
+  } else {
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+  }
 });
 
 //render new urls page
@@ -62,7 +64,7 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[shortURL];
   if (longURL) {
     res.redirect(longURL);
-  } else res.status(404); {
+  } else { res.status(404).send("I'm sorry the page you are trying to access is not here.");;
   }
 });
 
