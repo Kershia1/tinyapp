@@ -16,6 +16,18 @@ const urlDatabase = {
 //script to run nodemon ./node_modules/.bin/nodemon -L server.js
 //-L flag due to a shared file sys i.e. vagrant
 
+//Handler for post req to login user
+app.post('/login', (req, res) => {
+  const userName = req.body.userName; //retrieves username from req body
+  res.cookies('username', username); //username value => cookie
+  if(username) {
+    res.redirect('/urls');
+  } else {
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+  }
+});
+
+
 //Handler for post req to update a urlDatabase in database
 app.post('urls/:id', (req, res) => {
   const longURL = req.body.newLongURL; //adding new long URL
