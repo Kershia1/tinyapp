@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
@@ -20,11 +21,11 @@ const urlDatabase = {
 app.post('/login', (req, res) => {
   const userName = req.body.userName; //retrieves username from req body
   res.cookies('username', username); //username value => cookie
-  if(username) {
+  // if(username) {
     res.redirect('/urls');
-  } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here.");
-  }
+  // } else {
+  //   res.status(404).send("I'm sorry the page you are trying to access is not here.");
+  // }
 });
 
 
