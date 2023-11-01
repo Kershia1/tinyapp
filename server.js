@@ -38,17 +38,25 @@ app.set("view engine", "ejs");
 /////////////////////////////////////////////////
 
 //Handler for post req to login user
+//This leads to session management after cookie validation to that user...?
 app.post('/login', (req, res) => {
   const userName = req.cookies.userName; //retrieves username from cookies
   const userID = user[userName] //username value => cookie
-  if(userID) {
-    const templateVars = {
-      user: userID
-    };
-    res.status(200);
+  if(userID) { //user Obj
+    res.cookie('userName', userName); // need to immediatly validate obj with cookie to proceed and set the cookie, or will loop immediately else.
+    res.redirect('/urls');
   } else {
     res.status(401).end('<h2>Please try again.</h2>');
   }
+});
+
+//Display User Name in header 
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("urls_index", templateVars);
 });
 
 //Handler for post req to update a urlDatabase in database
