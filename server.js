@@ -1,37 +1,58 @@
+// Packages
+/////////////////////////////////////////////////
 const express = require("express");
+const cookieParser = require("cookie-parser");
+const morgan = require('morgan');
+
+//Set-up
+////////////////////////////////////////////////
 const app = express();
 const PORT = 8080; // default port 8080
-const cookieParser = require("cookie-parser");
 
+
+//Helper Function's
+/////////////////////////////////////////////////
+// tried doing this de-structured didn't go well
+const helpers = require("./helpers");
+const urlDatabase = helpers.urlDatabase;
+const user = helpers.user;
+const generateRandomString = helpers.generateRandomString;
+
+//Installed Middleware
+/////////////////////////////////////////////////
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(morgan('dev'));
+app.use("/static", express.static("public")); //express.static(root, [options])
+//The express.static() function is a built-in middleware function in Express. It serves static files and is based on serve-static. Parameters: The root parameter describes the root directory from which to serve static assets. 
+// https://www.geeksforgeeks.org/express-js-express-static-function/
+//Return Value: It returns an Object. 
 
+
+
+//Template used
+/////////////////////////////////////////////////
 app.set("view engine", "ejs");
 
-//url Database
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-//http://localhost:8080/urls/b2xVn2 works!
-//http://localhost:8080/urls/new
-//script to run nodemon ./node_modules/.bin/nodemon -L server.js
-//-L flag due to a shared file sys i.e. vagrant
+//Routing
+/////////////////////////////////////////////////
 
 //Handler for post req to login user
 app.post('/login', (req, res) => {
-  const userName = req.body.userName; //retrieves username from req body
-  res.cookies('username', username); //username value => cookie
-  // if(username) {
-    res.redirect('/urls');
-  // } else {
-  //   res.status(404).send("I'm sorry the page you are trying to access is not here.");
-  // }
+  const userName = req.cookies.userName; //retrieves username from cookies
+  const userID = user[userName] //username value => cookie
+  if(userID) {
+    const templateVars = {
+      user: userID
+    };
+    res.status(200);
+  } else {
+    res.status(401).end('<h2>Please try again.</h2>');
+  }
 });
 
-
 //Handler for post req to update a urlDatabase in database
-app.post('urls/:id', (req, res) => {
+app.post('/urls/:id', (req, res) => {
   const longURL = req.body.newLongURL; //adding new long URL
   const shortURL = req.params.id; // setting params to get short url
   urlDatabase[shortURL] = longURL; //store in database
@@ -48,10 +69,10 @@ app.post('/urls', (req, res) => {
 
 //delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
-  const deleteURL = req.params.shortURL;
+  const deleteURL = req.params.id;
   if (urlDatabase[deleteURL]) {
     delete urlDatabase[deleteURL];
-  res.redirect('/urls');
+    res.redirect('/urls');
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
@@ -74,13 +95,12 @@ app.get("/urls/:id", (req, res) => {
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.post("/urls/:id", (req, res) => {
   const editURL = req.body.longURL;
-  if(urlDatabase[editURL]) {
-  res.redirect('/urls');
+  if (urlDatabase[editURL]) {
+    res.redirect('/urls');
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
 });
-
 
 //Redirection from short url alias to long url
 // potential for error handeling?
@@ -89,7 +109,8 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[shortURL];
   if (longURL) {
     res.redirect(longURL);
-  } else { res.status(404).send("I'm sorry the page you are trying to access is not here.");;
+  } else {
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");;
   }
 });
 
@@ -110,7 +131,7 @@ app.get('/index', (req, res) => {
 });
 
 //route to render about
-app.get('about', (req, res) => {
+app.get('/about', (req, res) => {
   res.render('pages/about'); //render about
 });
 
@@ -119,21 +140,8 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 }); // JSON String => returns urlDatabase object at that point in time 
 
-//self explanitory
-function generateRandomString(length) {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let randomString = "";
-
-  for (let i = 0; i < length; i++) {
-    const randoString = Math.floor(Math.random() * characters.length);
-    randomString += characters[randoString];
-  }
-  return randomString;
-}
-
-const randomString = generateRandomString(6);
-
-//port I am listening on 8080, generated after starting Express App
+//Listener
+/////////////////////////////////////////////////
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
