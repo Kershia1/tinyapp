@@ -18,6 +18,11 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+     <!-- Display username if logged in -->
+    <% if (username) { %>
+      <p class="navbar-text">Logged in as: <%= username %></p>
+      <% } %>
+       <!-- login form -->
     <form class="form-inline" action="/login" method="POST">
       <div class="form-group mb-2">
         <label for="login"></label>
@@ -31,6 +36,7 @@
           style="width: 300px; margin: 1em"
         />
         <button type="submit" class="btn btn-primary">Login</button>
+        <!-- logout form here? -->
       </div>
     </form>
   </nav>

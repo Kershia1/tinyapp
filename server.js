@@ -43,7 +43,7 @@ app.get('/login', (req, res) => {
   const username = "Michelle_Flowers"; // You should specify the username here
   const userData = user[username]; //user k:v p
   if (userData) { // passed obj is t 
-    res.cookie('userName', userData.username); // Set a cookie with the username
+    req.cookie('username', userData.username); // Set a cookie with the username
     console.log('Cookie set:', userData.username); // Add this line to log the cookie value
     res.redirect('/urls');// if all good
   } else {
@@ -54,34 +54,21 @@ app.get('/login', (req, res) => {
 //Server reads cookie 
 app.post('/login', (req, res) => {
   const username = req.body.username; // Read the cookie with the key 'userName'
-  console.log('User Name:', username); // I want this to be on the header?
+  // console.log('User Name:', username); // I want this to be on the header?
   if (username) {
-    res.cookie('userCookie', username);
+    res.cookie('username', username);
   }
   res.redirect('/urls');
 });
 
-
-//Handler for post req to login user
-//This leads to session management after cookie validation to that user...?
-// app.post('/login', (req, res) => {
-//   const userName = req.cookies["userName"]; //retrieves username from cookies
-//   const userID = user[userName] //username value => cookie
-//   if(userID) { //user Obj
-//     res.cookie('userName', userName); // need to immediatly validate obj with cookie to proceed and set the cookie, or will loop immediately else.
-//     res.redirect('/urls');
-//   } else {
-//     res.status(401).end('Please try again.');
-//   }
-// });
-
 //Display User Name in header 
 app.get("/urls", (req, res) => {
+  const username = req.cookies.username; // need to request the cookies here 
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies.userName,
-    // ... any other vars
+    username: username, // do not request here in object
   };
+  console.log('Logged in as:', username);
   res.render("urls_index", templateVars);
 });
 
