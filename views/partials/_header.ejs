@@ -19,7 +19,22 @@
       </div>
     </div>
      <!-- Display username if logged in -->
+     <!-- Logout Form -->
     <% if (username) { %>
+      form class="form-inline" action="/logout" method="POST">
+      <div class="form-group mb-2">
+        <label for="logout"></label>
+        <input
+          class="form-control"
+          type="text"
+          name="username"
+          placeholder="username"
+          id="logout"
+          autocomplete="on"
+          style="width: 300px; margin: 1em"
+        />
+        <button type="submit" class="btn btn-primary">Logout</button>
+    } else { 
       <p class="navbar-text">Logged in as: <%= username %></p>
       <% } %>
        <!-- login form -->
@@ -36,7 +51,6 @@
           style="width: 300px; margin: 1em"
         />
         <button type="submit" class="btn btn-primary">Login</button>
-        <!-- logout form here? -->
       </div>
     </form>
   </nav>
