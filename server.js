@@ -1,7 +1,7 @@
 // Packages
 /////////////////////////////////////////////////
 const express = require("express");
-// const session = require('express-session');
+const session = require('express-session');
 const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
 
@@ -24,6 +24,12 @@ const generateRandomString = helpers.generateRandomString;
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
+//how to set-up session management
+app.use(session({
+secret: 'b@dgerBADGERMushr00m',
+resave: false,
+saveUninitialized: true
+}))
 app.use("/static", express.static("public")); //express.static(root, [options])
 //The express.static() function is a built-in middleware function in Express. It serves static files and is based on serve-static. Parameters: The root parameter describes the root directory from which to serve static assets. 
 // https://www.geeksforgeeks.org/express-js-express-static-function/
@@ -35,6 +41,12 @@ app.use("/static", express.static("public")); //express.static(root, [options])
 /////////////////////////////////////////////////
 // app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
+
+//Session Notes: Concept explained with CHATGpt was very confused
+/////////////////////////////////////////////////
+//tack user specific data @login --> across multiple pages when active --> creates a way to save, manage, and retrieve personalized content to specific user.
+//explained by CookieYEs 
+// dif between session(nothign saved after close/logout) and persistent cookies(saved after these actions). Session cookies svae : "No personally identifiable data is collected by session cookies. They contain only a random number identifier that is used to index the server’s session cache. "" https://www.geeksforgeeks.org/difference-between-session-and-cookies/ stacks which lead to rabbit hole How to get the session value in ejs https://stackoverflow.com/questions/37183766/how-to-get-the-session-value-in-ejs Session vs Cookie, what's the difference?https://stackoverflow.com/questions/59507639/session-vs-cookie-whats-the-difference#:~:text=So%2C%20the%20difference%20is%3A%20A,to%20track%20individual%20user%20sessions.
 
 //Routing
 /////////////////////////////////////////////////
@@ -100,6 +112,7 @@ app.get('/register', (req, res) => {
   const templateVars = {
     user: req.cookies.username,
     password: req.cookies.password,
+    email: req.cookies.email
   };
   res.render('urls_register', templateVars);
 });
@@ -148,14 +161,18 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars ={
+    username: req.session.username
+  }
+  res.render("urls_new", templateVars);
 });
 
 //render the 'urls_show' page to display a specific URL
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id],
+    username: req.session.username
   };
   res.render("urls_show", templateVars);
 });
