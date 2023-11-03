@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About this Project and Citations Used</title>
+</head>
+<body>
+  <header>
+    <%- include('partials/_header') %>
+    </header>
+    <h2> I wanted to also include a quick thank you to all of the mentors at Lighthouse Labs who have helped me with building Tiny App. Without thier patience and kindness I would be too intimidated to ask the questions I need to learn and grow on this very difficulty journey of learning Web Development.</h2>
+    <h3> Notes to Self</h3>
+  <p> About the use static command on line 34: Express.static(root, [options])
+    The express.static() function is a built-in middleware function in Express. It serves static files and is based on serve-static. Parameters: The root parameter describes the root directory from which to serve static assets. 
+     https://www.geeksforgeeks.org/express-js-express-static-function/
+    Return Value: It returns an Object. </p>
+    <p> Notes on Sessions and Cookies: 
+      Session Notes: Concept explained with CHATGpt was very confused
+      /////////////////////////////////////////////////
+      tack user specific data @login --> across multiple pages when active --> creates a way to save, manage, and retrieve personalized content to specific user.
+      explained by CookieYEs 
+      dif between session(nothign saved after close/logout) and persistent cookies(saved after these actions). Session cookies svae : "No personally identifiable data is collected by session cookies. They contain only a random number identifier that is used to index the server’s session cache. "" https://www.geeksforgeeks.org/difference-between-session-and-cookies/ stacks which lead to rabbit hole How to get the session value in ejs https://stackoverflow.com/questions/37183766/how-to-get-the-session-value-in-ejs Session vs Cookie, what's the difference?https://stackoverflow.com/questions/59507639/session-vs-cookie-whats-the-difference#:~:text=So%2C%20the%20difference%20is%3A%20A,to%20track%20individual%20user%20sessions.</p>
+</body>
+</html>
