@@ -31,23 +31,12 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
-app.use("/static", express.static("public")); //express.static(root, [options])
-//The express.static() function is a built-in middleware function in Express. It serves static files and is based on serve-static. Parameters: The root parameter describes the root directory from which to serve static assets. 
-// https://www.geeksforgeeks.org/express-js-express-static-function/
-//Return Value: It returns an Object. 
-
-
+app.use("/static", express.static("public")); 
 
 //Template used
 /////////////////////////////////////////////////
 // app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
-
-//Session Notes: Concept explained with CHATGpt was very confused
-/////////////////////////////////////////////////
-//tack user specific data @login --> across multiple pages when active --> creates a way to save, manage, and retrieve personalized content to specific user.
-//explained by CookieYEs 
-// dif between session(nothign saved after close/logout) and persistent cookies(saved after these actions). Session cookies svae : "No personally identifiable data is collected by session cookies. They contain only a random number identifier that is used to index the server’s session cache. "" https://www.geeksforgeeks.org/difference-between-session-and-cookies/ stacks which lead to rabbit hole How to get the session value in ejs https://stackoverflow.com/questions/37183766/how-to-get-the-session-value-in-ejs Session vs Cookie, what's the difference?https://stackoverflow.com/questions/59507639/session-vs-cookie-whats-the-difference#:~:text=So%2C%20the%20difference%20is%3A%20A,to%20track%20individual%20user%20sessions.
 
 //Routing
 /////////////////////////////////////////////////
@@ -113,15 +102,45 @@ app.get('/register', (req, res) => {
 
 //POST submitted forms to registration page
 //post /register route is in the next activity, will return 404 until we reach that stage
+
+/* create the endpoint that handles the registration form data:
+*This endpoint should add a new user object to the global users object. include the user's id, email and password.
+* generate rand string to make username
+*After adding the user, set a user_id cookie containing the user's newly generated ID.
+*Redirect the user to the /urls page.
+*Test that the users object is properly being appended to. You can insert a console.log or debugger prior to the redirect logic to inspect what data the object contains.
+ */
+
+/*Pseudo Code:
+ * create a post that will pass the entire user obj through template vars 
+ * after passing this information through I want to be able to extract and compare the values T for user_ID, email, password input and ensure they have been appended to the users database
+ *Once successfully registered, redirect the user to the /urls page. 
+ I would prefer to redirect immediately to the login page. And then have them login to restart their sessions. Possible to add a 1-day time out to their cookies to log them out if in for more than 1 day? 
+ * 
+ */
+//Handler to register new user, save to user database, redirect to urls
 app.post('/register', (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  if (username && password) {
-    res.cookie('username', username);
-    res.cookie('passsword', password);
-    res.redirect('/urls');
+  const user_ID = generateRandomString(8); //create random user name
+  // const username = req.body.username; feel like this will throw an error with headers as undefined?
+  const user_Email = req.body.email; // email paras
+  const password = req.body.password;// password paras
+  //filter by checking if the email has already been used
+  if (registeredEmail(user_Email)) {
+    res.status(400).send('This email is already in use please try another.'); //not sure about this 
+    console.log(users);
   } else {
-    res.status(400).send('Broken!');
+    // email is not registered pass through users Object access k:v p's and create a new user?
+    users[user_ID] = {
+      id: user_ID,
+      email: user_Email,
+      password: password
+    };
+    console.log(users); //error handeling
+    //store new user in database like a random string
+    users[user_ID] = users; //?
+    //create a user cookie 
+    res.cookie(user_ID);//?
+    res.redirect('/urls');// my endpoint back to urls
   }
 });
 
@@ -205,7 +224,7 @@ app.get('/index', (req, res) => {
 
 //route to render about
 app.get('/about', (req, res) => {
-  res.render('pages/about'); //render about
+  res.render('about'); //render about
 });
 
 // sends a response with the url database sent as a json file 
