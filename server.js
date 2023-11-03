@@ -38,7 +38,7 @@ app.set("view engine", "ejs");
 //Routing
 /////////////////////////////////////////////////
 
-//Handler for Get request to set cookie
+//Handler for Get request to set cookie, and display login form
 app.get('/login', (req, res) => {
   const username = "Michelle_Flowers"; // You should specify the username here
   const userData = user[username]; //user k:v p
@@ -51,7 +51,7 @@ app.get('/login', (req, res) => {
   }
 });
 
-//Server reads cookie to populate login information from stored values
+//Set cookie for login 
 app.post('/login', (req, res) => {
   const username = req.body.username; // Read the cookie with the key 'userName'
   // console.log('User Name:', username); // I want this to be on the header?
@@ -61,13 +61,19 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
-//Server reads cookie to populate logout information from stored values and redirects to /urs for now, later a dedicated login page
+//Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  const username = req.body.username; // Read the cookie with the key 'userName'
-  if (username === username) {
-    res.cookie('username', username);
-  }
+  res.clearCookie('username');
   res.redirect('/urls');
+});
+
+//Delete User Cookie
+app.get('/login', (req, res) => {
+  // for(const username in req.cookies) {
+  //     res.clearCookie(username);
+  // }
+  res.clearCookie('username'); // DELETE A COOKIE BY KEY
+  res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
 });
 
 //Display User Name in header 
