@@ -1,11 +1,26 @@
 const user = {
   "Michelle_Flowers": {
     userName: "Michelle_Flowers",
+    email: "Michelle_Flowers@example.com",
     password: 789
   },
   "Danny_Trejo": {
     userName: "Danny_Trejo",
+    email: "Danny_Trejo@example.com",
     password: 456
+  },
+};
+
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
   },
 };
 
@@ -27,4 +42,4 @@ function generateRandomString(length) {
 
 const randomString = generateRandomString(6);
 
-module.exports = { urlDatabase, user, generateRandomString};
+module.exports = { urlDatabase, user, users, generateRandomString};

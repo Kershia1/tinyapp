@@ -17,6 +17,7 @@ const PORT = 8080; // default port 8080
 const helpers = require("./helpers");
 const urlDatabase = helpers.urlDatabase;
 const user = helpers.user;
+const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
 
 //Installed Middleware
@@ -26,10 +27,10 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 //how to set-up session management
 app.use(session({
-secret: 'b@dgerBADGERMushr00m',
-resave: false,
-saveUninitialized: true
-}))
+  secret: 'b@dgerBADGERMushr00m',
+  resave: false,
+  saveUninitialized: true
+}));
 app.use("/static", express.static("public")); //express.static(root, [options])
 //The express.static() function is a built-in middleware function in Express. It serves static files and is based on serve-static. Parameters: The root parameter describes the root directory from which to serve static assets. 
 // https://www.geeksforgeeks.org/express-js-express-static-function/
@@ -73,7 +74,7 @@ app.post('/login', (req, res) => {
   }
   res.redirect('/urls');
 });
-
+//req.session.username = username; instead of cookies
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
@@ -88,6 +89,7 @@ app.get('/login', (req, res) => {
   res.clearCookie('username'); // DELETE A COOKIE BY KEY
   res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
 });
+//look at session option for logging out the user
 
 //Display User Name in header 
 app.get("/urls", (req, res) => {
@@ -100,25 +102,19 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// a GET /register endpoint, which returns the template you just created.
-
-
-// Instruction
-// Create a new template that includes a form with an email address and password field. The email field should use type=email and have name=email. The password field should use type=password and have name=password. The form should POST to /register.
-////////////// IN progress 
-//Renders Registration Page
 // Render Registration Page
+//always remeber the status of the user no account, registered, and logged in ...
 app.get('/register', (req, res) => {
   const templateVars = {
-    user: req.cookies.username,
-    password: req.cookies.password,
-    email: req.cookies.email
+    username: undefined
   };
   res.render('urls_register', templateVars);
 });
 
+//POST submitted forms to registration page
+//post /register route is in the next activity, will return 404 until we reach that stage
 app.post('/register', (req, res) => {
-  const username = req.body.username; 
+  const username = req.body.username;
   const password = req.body.password;
   if (username && password) {
     res.cookie('username', username);
@@ -128,9 +124,6 @@ app.post('/register', (req, res) => {
     res.status(400).send('Broken!');
   }
 });
-
-//post /register route is in the next activity, will return 404 until we reach that stage
-
 
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
@@ -161,9 +154,9 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get("/urls/new", (req, res) => {
-  const templateVars ={
+  const templateVars = {
     username: req.session.username
-  }
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -205,19 +198,9 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars); //render in urls_index.ejs
 });
 
-//Basic welcome message done with HTML
-app.get("/hello", (req, res) => {
-  res.send("<html><body><b>Welcome !</b></body></html>\n");
-}); // Welcome ! in bold text
-
-//route to render index 
-app.get('/register', (req, res) => {
-  res.render('register'); //render register
-});
-
 //route to render index 
 app.get('/index', (req, res) => {
-  res.render('index'); //render index
+  res.render('index');
 });
 
 //route to render about
