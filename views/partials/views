@@ -1,24 +1,42 @@
+<!-- can use ! + enter or ! + tab to pre-load the HTML Skeleton -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login In</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+      crossorigin="anonymous"
+    />
+  <title>Registration Page</title>
 </head>
 <body>
-    <h1>LoginIn</h1>
-    <p>Please log in:</p>
-    <!-- METHOD=VERB; ACTION=PATH -->
-    <form method="POST" action="/log-in">
-        <label for="user">
-            Username:
-        </label>
-        <input type="text" id="user" name="username" value="" placeholder="">
-        <label for="pass">
-            Password:
-        </label>
-        <input type="password" id="pass" name="password" value="" placeholder="">
-        <input type="submit" value="Click Here to Log In">
-    </form>
+  <header>
+    <%- include('partials/_header') %>
+  </header>
+  <main style="margin: 1em;">
+    <h3>Register Here</h3>
+    <p> To get started with your URL Shortening Experience. You will need to create a unique Username and Password.</p>
+    <!-- E-mail Field -->
+    <form method="POST" action="/register">
+      <label for="username">
+          Username:
+      </label>
+      <input class="form-control" type="email" name="email" value="" placeholder="" style="width: 300px; margin: 1em">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <!-- Password Field -->
+      <label for="password">
+          Password:
+      </label>
+      <input class="form-control" type="password" name="password" value="" placeholder="" >
+      <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </body>
 </html>
