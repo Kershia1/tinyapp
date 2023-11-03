@@ -87,6 +87,13 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// a GET /register endpoint, which returns the template you just created.
+
+//Renders Registration Page
+app.get("/Register", (req, res) => {
+  res.render("urls_register");
+});
+
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
   const longURL = req.body.newLongURL; //adding new long URL
