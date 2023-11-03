@@ -4,14 +4,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Registration Page</title>
 </head>
 <body>
   <header>
     <%- include('partials/_header') %>
   </header>
   <main style="margin: 1em;">
-    <h3>Registration Page</h3>
     <p> To get started with your URL Shortening Experience. You will need to create a unique Username and Password.</p>
+    <!-- E-mail Field -->
+    <form method="POST" action="/register">
+      <label for="register">
+          Username:
+      </label>
+      <input type="email" id="user" name="email" value="" placeholder="">
+      <!-- Password Field -->
+      <label for="pass">
+          Password:
+      </label>
+      <input type="password" id="pass" name="password" value="" placeholder="">
+      <input type="submit" value="Click Here to Register">
+  </form>
 </body>
-</html>
+</html>d

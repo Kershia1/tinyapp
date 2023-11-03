@@ -89,10 +89,38 @@ app.get("/urls", (req, res) => {
 
 // a GET /register endpoint, which returns the template you just created.
 
+
+// Instruction
+// Create a new template that includes a form with an email address and password field. The email field should use type=email and have name=email. The password field should use type=password and have name=password. The form should POST to /register.
+////////////// IN progress 
 //Renders Registration Page
-app.get("/Register", (req, res) => {
-  res.render("urls_register");
+app.get("/urls/register", (req, res) => {
+  const templateVars = {
+    user: req.cookies.username,
+    password: req.cookies.password
+  }
+  res.render("urls_register", templateVars);
 });
+
+app.post('/register', (req, res) => {
+  const username = req.body.username; // Read the cookie with the key 'userName'
+  // console.log('User Name:', username); // I want this to be on the header?
+  const password = req.body.password
+  if (username && password) {
+    res.cookie('username', username);
+    res.cookie('passsword', password);
+  }
+  res.redirect('/urls');
+});
+
+//////////////
+//render new urls page
+// app.get("/urls/new", (req, res) => {
+//   res.render("urls_new");
+// });
+
+//post /register route is in the next activity, will return 404 until we reach that stage
+
 
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
