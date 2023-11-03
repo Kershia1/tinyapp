@@ -51,11 +51,20 @@ app.get('/login', (req, res) => {
   }
 });
 
-//Server reads cookie 
+//Server reads cookie to populate login information from stored values
 app.post('/login', (req, res) => {
   const username = req.body.username; // Read the cookie with the key 'userName'
   // console.log('User Name:', username); // I want this to be on the header?
   if (username) {
+    res.cookie('username', username);
+  }
+  res.redirect('/urls');
+});
+
+//Server reads cookie to populate logout information from stored values and redirects to /urs for now, later a dedicated login page
+app.post('/logout', (req, res) => {
+  const username = req.body.username; // Read the cookie with the key 'userName'
+  if (username === username) {
     res.cookie('username', username);
   }
   res.redirect('/urls');
