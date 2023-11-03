@@ -33,6 +33,7 @@ app.use("/static", express.static("public")); //express.static(root, [options])
 
 //Template used
 /////////////////////////////////////////////////
+// app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 //Routing
@@ -94,30 +95,26 @@ app.get("/urls", (req, res) => {
 // Create a new template that includes a form with an email address and password field. The email field should use type=email and have name=email. The password field should use type=password and have name=password. The form should POST to /register.
 ////////////// IN progress 
 //Renders Registration Page
-app.get("/urls/register", (req, res) => {
+// Render Registration Page
+app.get('/register', (req, res) => {
   const templateVars = {
     user: req.cookies.username,
-    password: req.cookies.password
-  }
-  res.render("urls_register", templateVars);
+    password: req.cookies.password,
+  };
+  res.render('urls_register', templateVars);
 });
 
 app.post('/register', (req, res) => {
-  const username = req.body.username; // Read the cookie with the key 'userName'
-  // console.log('User Name:', username); // I want this to be on the header?
-  const password = req.body.password
+  const username = req.body.username; 
+  const password = req.body.password;
   if (username && password) {
     res.cookie('username', username);
     res.cookie('passsword', password);
+    res.redirect('/urls');
+  } else {
+    res.status(400).send('Broken!');
   }
-  res.redirect('/urls');
 });
-
-//////////////
-//render new urls page
-// app.get("/urls/new", (req, res) => {
-//   res.render("urls_new");
-// });
 
 //post /register route is in the next activity, will return 404 until we reach that stage
 
@@ -195,6 +192,11 @@ app.get("/urls", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body><b>Welcome !</b></body></html>\n");
 }); // Welcome ! in bold text
+
+//route to render index 
+app.get('/register', (req, res) => {
+  res.render('register'); //render register
+});
 
 //route to render index 
 app.get('/index', (req, res) => {
