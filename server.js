@@ -101,23 +101,6 @@ app.get('/register', (req, res) => {
 });
 
 //POST submitted forms to registration page
-//post /register route is in the next activity, will return 404 until we reach that stage
-
-/* create the endpoint that handles the registration form data:
-*This endpoint should add a new user object to the global users object. include the user's id, email and password.
-* generate rand string to make username
-*After adding the user, set a user_id cookie containing the user's newly generated ID.
-*Redirect the user to the /urls page.
-*Test that the users object is properly being appended to. You can insert a console.log or debugger prior to the redirect logic to inspect what data the object contains.
- */
-
-/*Pseudo Code:
- * create a post that will pass the entire user obj through template vars 
- * after passing this information through I want to be able to extract and compare the values T for user_ID, email, password input and ensure they have been appended to the users database
- *Once successfully registered, redirect the user to the /urls page. 
- I would prefer to redirect immediately to the login page. And then have them login to restart their sessions. Possible to add a 1-day time out to their cookies to log them out if in for more than 1 day? 
- * 
- */
 //Handler to register new user, save to user database, redirect to urls
 app.post('/register', (req, res) => {
   const user_ID = generateRandomString(8); //create random user name 8 of 8 characters.
@@ -125,12 +108,10 @@ app.post('/register', (req, res) => {
   const user_Email = req.body.email; // email paras
   const password = req.body.password;// password paras
   //filter by checking if the email has already been used
-  const registered_Email = Object.values(users).sort(user => user.email === user_Email);
+  const registered_Email = Object.values(users).some(user => user.email === user_Email); // access and compar ID and Email, used .sort by accident
   const registered_ID = user_ID in users;//?
-  if (registered_Email || registered_ID ) { //(registeredEmail(user_Email))
-    //reminder of not oppr useage The NOT operator returns true for a false expression and false for a true expression tried checking if falsy to verfiy if already in, forgot to checkthe users email. Should check to see if user or email already exist in database.
-    res.status(400).send('This email is already in use please try another.'); //not sure about this 
-    // console.log(users);
+  if (registered_Email || registered_ID ) { 
+    res.status(400).send('This email is already in use please try another.'); //
   } else {
     // email is not registered pass through users Object access k:v p's and create a new user?
     users[user_ID] = {
@@ -139,9 +120,6 @@ app.post('/register', (req, res) => {
       password: password
     };
     console.log(users); //error handeling
-    //store new user in database like a random string
-    // users[user_ID] = users; //?
-    //create a user cookie 
     res.cookie('user_ID', user_ID);
     res.redirect('/urls');// my endpoint back to urls
   }
