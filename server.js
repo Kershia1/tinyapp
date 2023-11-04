@@ -83,31 +83,20 @@ app.get('/login', (req, res) => {
 
 //Display User Name in header 
 app.get("/urls", (req, res) => {
-  const user_ID = req.cookies.user_ID; // need to request the cookies here 
+  const user_Email = req.cookies.user_Email; // need to request the cookies here 
   const templateVars = {
     urls: urlDatabase,
-    user_ID: user_ID, // do not request here in object
+    user_Email: user_Email // do not request here in object
   };
   console.log('Logged in as:', user_Email);
   res.render("urls_index", templateVars);
 });
 
-//Display User Name in header 
-// app.get("/urls", (req, res) => {
-//   const user_ID = req.cookies.user_ID; // need to request the cookies here 
-//   const templateVars = {
-//     urls: urlDatabase,
-//     user_ID: user_ID, // do not request here in object
-//   };
-//   console.log('Logged in as:', user_Email);
-//   res.render("urls_index", templateVars);
-// });
-
 // Render Registration Page
 //always remeber the status of the user no account, registered, and logged in ...
 app.get('/register', (req, res) => {
   const templateVars = {
-    user_ID: undefined
+    user_Email: undefined
   };
   res.render('urls_register', templateVars);
 });
@@ -166,8 +155,9 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get("/urls/new", (req, res) => {
+  const user_Email = req.cookies.user_Email;
   const templateVars = {
-    user_ID: req.session.user_ID
+    user_Email: user_Email
   };
   res.render("urls_new", templateVars);
 });
@@ -217,10 +207,11 @@ app.get('/index', (req, res) => {
 
 //route to render about
 app.get('/about', (req, res) => {
-  const templateVars ={
-    user_ID: req.params.user_ID
-  }
-  res.render('about'); //render about
+  const user_Email = req.cookies.user_Email;
+  const templateVars = {
+    user_Email: user_Email
+  };
+  res.render('about', templateVars); //render about
 });
 
 // sends a response with the url database sent as a json file 
