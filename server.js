@@ -43,11 +43,11 @@ app.set("view engine", "ejs");
 
 //Handler for Get request to set cookie, and display login form
 app.get('/login', (req, res) => {
-  const user_ID = ""; // You should specify the user_ID here
-  const userData = users[id]; //user k:v p
+  const user_Email = user_Email; // You should specify the user_ID here
+  const userData = users[email]; //user k:v p
   if (userData) { // passed obj is t 
-    req.cookie('user_ID', userData.user_ID); // Set a cookie with the user_ID
-    console.log('Cookie set:', userData.user_ID); // Add this line to log the cookie value
+    res.cookie('user_Email', userData.email); // Set a cookie with res not req
+    console.log('Cookie set:', userData.email); // Add this line to log the cookie value
     res.redirect('/urls');// if all good
   } else {
     res.status(404).end('<p>User not found</p>');//redirect failed
@@ -56,26 +56,23 @@ app.get('/login', (req, res) => {
 
 //Set cookie for login 
 app.post('/login', (req, res) => {
-  const user_ID = req.body.user_ID; // Read the cookie with the key 'user_ID'
+  const user_Email = req.body.user_Email; // Read the cookie with the key 'user_ID'
   // console.log('User Name:', user_ID); // I want this to be on the header?
-  if (user_ID) {
-    res.cookie('user_ID', user_ID);
+  if (user_Email) {
+    res.cookie('user_Email', user_Email);
   }
   res.redirect('/urls');
 });
 //req.session.user_ID = user_ID; instead of cookies
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_ID');
+  res.clearCookie('user_Email');
   res.redirect('/urls');
 });
 
 //Delete User Cookie
-app.get('/login', (req, res) => {
-  // for(const user_ID in req.cookies) {
-  //     res.clearCookie(user_ID);
-  // }
-  res.clearCookie('user_ID'); // DELETE A COOKIE BY KEY
+app.get('/logout', (req, res) => {
+  res.clearCookie('user_Email'); // DELETE A COOKIE BY KEY
   res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
 });
 //look at session option for logging out the user
