@@ -212,6 +212,11 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
+//render login page
+app.get('/login', (req, res) => {
+res.render('/login');
+});
+
 //render urls index page to display all urls in database
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
