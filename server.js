@@ -98,30 +98,51 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
-//POST submitted forms to registration page
-//Handler to register new user, save to user database, redirect to urls
+//Duy's Happy Path intigrated in with my not happy path.
+// POST /register
 app.post('/register', (req, res) => {
-  const user_ID = generateRandomString(8); //create random user name 8 of 8 characters.
-  // const user_ID = req.body.user_ID; feel like this will throw an error with headers as undefined?
+  // pull the info off the body object
   const user_Email = req.body.email; // email paras
   const password = req.body.password;// password paras
-  //filter by checking if the email has already been used
-  const registered_Email = Object.values(users).some(user => user.email === user_Email); // access and compar ID and Email, used .sort by accident
-  const registered_ID = user_ID in users;//?
-  if (registered_Email || registered_ID ) { 
-    res.status(400).send('This email is already in use please try another.'); //
-  } else {
-    // email is not registered pass through users Object access k:v p's and create a new user?
-    users[user_ID] = {
-      id: user_ID,
-      email: user_Email,
-      password: password
-    };
-    console.log(users); //error handeling
-    res.cookie('user_ID', user_ID);
-    res.redirect('/urls');// my endpoint back to urls
+
+  // did we NOT receive an email and/or password
+  if (!user_Email || !password) {
+    return res.status(400).send('Both e-mail and a password must be provided to successfully register.');
   }
+
+  // look through existing users to see if one already has the email provided
+  let registeredUser = null;
+
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === user_Email) {
+      // we found a duplicate email
+      foundUser = user;
+    }
+  }
+
+  // did we find an existing user with that email?
+  if (registeredUser) {
+    return res.status(400).send('a user with that email already exists');
+  }
+
+  // happy path! we can create the new user object
+  const user_ID = generateRandomString(8); //create random user name 8 of 8
+  const newUser = {
+    id: user_ID,
+    email: user_Email,
+    // password: bcrypt.hashSync(password, 10)
+  };
+
+  // add the new user to the users object
+  users[user_ID] = newUser;
+  console.log(users); //error handeling
+  res.cookie('user_ID', user_ID);
+  res.redirect('/urls');// my endpoint back to urls
+  // redirect to the login page
+  // res.redirect('/login');
 });
+
 
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
