@@ -26,18 +26,14 @@ crossorigin="anonymous"
 <h3>Register Here</h3>
 <p> To get started with your URL Shortening Experience. You will need to enter your e-mail and a Password.</p>
 <!-- E-mail Form -->
-<form method="POST" action="/register/email">
+<form method="POST" action="/register">
 <label for="email">Email:</label>
-<input class="form-control" type="email" name="email" value="" placeholder="" style="width: 300px; margin: 1em">
-<button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<input class="form-control" type="email" name="email" value="register" placeholder="email" style="width: 300px; margin: 1em">
 <!-- Password Form -->
-<form>
-<label for="password"></label>
-Password:
-<form method="POST" action="/register/password"></form>
-<input class="form-control" type="password" name="password" value="" placeholder="" >
-<button type="submit" class="btn btn-primary">Submit</button>
+<label for="password">Password:</label>
+<!-- removed from both forms the "/register/______ routes" added register to value, unnested forms to 1 form, created 1 registration button instead of 2 -->
+<input class="form-control" type="password" name="password" value="register" placeholder="password" >
+<button type="submit" class="btn btn-primary">Register</button>
 </form>
 </body>
 </html> 

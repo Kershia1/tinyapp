@@ -120,14 +120,17 @@ app.get('/register', (req, res) => {
  */
 //Handler to register new user, save to user database, redirect to urls
 app.post('/register', (req, res) => {
-  const user_ID = generateRandomString(8); //create random user name
+  const user_ID = generateRandomString(8); //create random user name 8 of 8 characters.
   // const username = req.body.username; feel like this will throw an error with headers as undefined?
   const user_Email = req.body.email; // email paras
   const password = req.body.password;// password paras
   //filter by checking if the email has already been used
-  if (registeredEmail(user_Email)) {
+  const registered_Email = Object.values(users).sort(user => user.email === user_Email);
+  const registered_ID = user_ID in users;//?
+  if (registered_Email || registered_ID ) { //(registeredEmail(user_Email))
+    //reminder of not oppr useage The NOT operator returns true for a false expression and false for a true expression tried checking if falsy to verfiy if already in, forgot to checkthe users email. Should check to see if user or email already exist in database.
     res.status(400).send('This email is already in use please try another.'); //not sure about this 
-    console.log(users);
+    // console.log(users);
   } else {
     // email is not registered pass through users Object access k:v p's and create a new user?
     users[user_ID] = {
@@ -137,9 +140,9 @@ app.post('/register', (req, res) => {
     };
     console.log(users); //error handeling
     //store new user in database like a random string
-    users[user_ID] = users; //?
+    // users[user_ID] = users; //?
     //create a user cookie 
-    res.cookie(user_ID);//?
+    res.cookie('user_ID', user_ID);
     res.redirect('/urls');// my endpoint back to urls
   }
 });
