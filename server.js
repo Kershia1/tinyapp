@@ -43,11 +43,11 @@ app.set("view engine", "ejs");
 
 //Handler for Get request to set cookie, and display login form
 app.get('/login', (req, res) => {
-  const username = "Michelle_Flowers"; // You should specify the username here
-  const userData = user[username]; //user k:v p
+  const user_ID = ""; // You should specify the user_ID here
+  const userData = users[id]; //user k:v p
   if (userData) { // passed obj is t 
-    req.cookie('username', userData.username); // Set a cookie with the username
-    console.log('Cookie set:', userData.username); // Add this line to log the cookie value
+    req.cookie('user_ID', userData.user_ID); // Set a cookie with the user_ID
+    console.log('Cookie set:', userData.user_ID); // Add this line to log the cookie value
     res.redirect('/urls');// if all good
   } else {
     res.status(404).end('<p>User not found</p>');//redirect failed
@@ -56,46 +56,58 @@ app.get('/login', (req, res) => {
 
 //Set cookie for login 
 app.post('/login', (req, res) => {
-  const username = req.body.username; // Read the cookie with the key 'userName'
-  // console.log('User Name:', username); // I want this to be on the header?
-  if (username) {
-    res.cookie('username', username);
+  const user_ID = req.body.user_ID; // Read the cookie with the key 'user_ID'
+  // console.log('User Name:', user_ID); // I want this to be on the header?
+  if (user_ID) {
+    res.cookie('user_ID', user_ID);
   }
   res.redirect('/urls');
 });
-//req.session.username = username; instead of cookies
+//req.session.user_ID = user_ID; instead of cookies
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_ID');
   res.redirect('/urls');
 });
 
 //Delete User Cookie
 app.get('/login', (req, res) => {
-  // for(const username in req.cookies) {
-  //     res.clearCookie(username);
+  // for(const user_ID in req.cookies) {
+  //     res.clearCookie(user_ID);
   // }
-  res.clearCookie('username'); // DELETE A COOKIE BY KEY
+  res.clearCookie('user_ID'); // DELETE A COOKIE BY KEY
   res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
 });
 //look at session option for logging out the user
 
+
 //Display User Name in header 
 app.get("/urls", (req, res) => {
-  const username = req.cookies.username; // need to request the cookies here 
+  const user_ID = req.cookies.user_ID; // need to request the cookies here 
   const templateVars = {
     urls: urlDatabase,
-    username: username, // do not request here in object
+    user_ID: user_ID, // do not request here in object
   };
-  console.log('Logged in as:', username);
+  console.log('Logged in as:', user_Email);
   res.render("urls_index", templateVars);
 });
+
+//Display User Name in header 
+// app.get("/urls", (req, res) => {
+//   const user_ID = req.cookies.user_ID; // need to request the cookies here 
+//   const templateVars = {
+//     urls: urlDatabase,
+//     user_ID: user_ID, // do not request here in object
+//   };
+//   console.log('Logged in as:', user_Email);
+//   res.render("urls_index", templateVars);
+// });
 
 // Render Registration Page
 //always remeber the status of the user no account, registered, and logged in ...
 app.get('/register', (req, res) => {
   const templateVars = {
-    username: undefined
+    user_ID: undefined
   };
   res.render('urls_register', templateVars);
 });
@@ -104,7 +116,7 @@ app.get('/register', (req, res) => {
 //Handler to register new user, save to user database, redirect to urls
 app.post('/register', (req, res) => {
   const user_ID = generateRandomString(8); //create random user name 8 of 8 characters.
-  // const username = req.body.username; feel like this will throw an error with headers as undefined?
+  // const user_ID = req.body.user_ID; feel like this will throw an error with headers as undefined?
   const user_Email = req.body.email; // email paras
   const password = req.body.password;// password paras
   //filter by checking if the email has already been used
@@ -155,7 +167,7 @@ app.post('/urls/:id/delete', (req, res) => {
 //render new urls page
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.session.username
+    user_ID: req.session.user_ID
   };
   res.render("urls_new", templateVars);
 });
@@ -165,7 +177,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.session.username
+    user_ID: req.session.user_ID
   };
   res.render("urls_show", templateVars);
 });
@@ -205,6 +217,9 @@ app.get('/index', (req, res) => {
 
 //route to render about
 app.get('/about', (req, res) => {
+  const templateVars ={
+    user_ID: req.params.user_ID
+  }
   res.render('about'); //render about
 });
 
