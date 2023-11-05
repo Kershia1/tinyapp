@@ -19,6 +19,7 @@ const urlDatabase = helpers.urlDatabase;
 const user = helpers.user;
 const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
+const path = require('path');
 
 //Installed Middleware
 /////////////////////////////////////////////////
@@ -35,34 +36,36 @@ app.use("/static", express.static("public"));
 
 //Template used
 /////////////////////////////////////////////////
-// app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 //Routing
 /////////////////////////////////////////////////
 
-//Handler for Get request to set cookie, and display login form
+//render login page
 app.get('/login', (req, res) => {
-  const user_Email = user_Email; // You should specify the user_ID here
-  const userData = users[email]; //user k:v p
-  if (userData) { // passed obj is t 
-    res.cookie('user_Email', userData.email); // Set a cookie with res not req
-    console.log('Cookie set:', userData.email); // Add this line to log the cookie value
-    res.redirect('/urls');// if all good
-  } else {
-    res.status(404).end('<p>User not found</p>');//redirect failed
-  }
+  const templateVars = {
+    users: undefined
+  };
+res.render('urls_login', templateVars);
 });
 
 //Set cookie for login 
 app.post('/login', (req, res) => {
-  const user_Email = req.body.user_Email; // Read the cookie with the key 'user_ID'
+  const user_Email = req.body.user_Email; 
+  const password = req.body.password;
   // console.log('User Name:', user_ID); // I want this to be on the header?
-  if (user_Email) {
+  if (users[user_Email] && users[user_Email].password === password) {
+    //allowed to login
     res.cookie('user_Email', user_Email);
+    res.redirect('/urls');
+  } else {
+    //not allowed to login
+    // (user_Email !== user_Email || password !== password) redundant code
+    res.status(401).end('<p>An incorrect email or password has been entered. Please try again.</p>');//redirect failed
   }
-  res.redirect('/urls');
 });
+
 //req.session.user_ID = user_ID; instead of cookies
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
@@ -182,10 +185,12 @@ app.get("/urls/new", (req, res) => {
 
 //render the 'urls_show' page to display a specific URL
 app.get("/urls/:id", (req, res) => {
+  const user_Email = req.cookies.user_Email;
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    user_ID: req.session.user_ID
+    user_ID: req.session.user_ID,
+    user_Email: user_Email
   };
   res.render("urls_show", templateVars);
 });
@@ -212,14 +217,13 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
-//render login page
-app.get('/login', (req, res) => {
-res.render('/login');
-});
-
 //render urls index page to display all urls in database
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const user_Email = req.cookies.user_Email;
+  const templateVars = { 
+    urls: urlDatabase,
+    user_Email: user_Email
+   };
   res.render("urls_index", templateVars); //render in urls_index.ejs
 });
 
