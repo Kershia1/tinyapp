@@ -28,23 +28,6 @@
         <label for="logout"></label>
         <p class="navbar-text">Logged in as: <%= user_Email %></p>
         <button type="submit" class="btn btn-primary">Logout</button>
-    <% } else { %>
-       <!-- login form -->
-    <form class="form-inline" action="/login" method="POST">
-      <div class="form-group mb-2">
-        <label for="login"></label>
-        <input
-          class="form-control"
-          type="text"
-          name="user_Email"
-          placeholder="user_Email"
-          id="login"
-          autocomplete="on"
-          style="width: 300px; margin: 1em"
-        />
-        <button type="submit" class="btn btn-primary">Login</button>
-      </div>
-    </form>
     <% } %>
   </nav>
 </header>

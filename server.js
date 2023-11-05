@@ -58,19 +58,35 @@ app.post('/urls_login', (req, res) => {
   console.log('User Email:', user_Email);
   console.log('Password:', password);
 
-  if (users[user_Email] && users[user_Email].password === password) {
-    //try a diffrent way to compare login credentials 
-    //allowed to login
-    res.cookie('user_Email', user_Email);
-    res.redirect('/urls');
+  let userMatch = false; 
+  // test if this account exists 
 
-  } else {
-    //not allowed to login
-    
-    console.log('Authentication failed for user:', user_Email);
-    res.status(401).end('<p>An incorrect email or password has been entered. Please try again.</p>');//redirect failed
+  for (const userId in users) {
+    let user = users[userId];
+    if (user.email === user_Email && user.password === password) {
+      // allow login
+      userMatch = true;
+      res.cookie('user_Email', user_Email);
+      res.redirect('/urls');
+      break;
+      //login failed
+    } 
+  }
+  if(!userMatch) {
+    return res.send('<p>An incorrect email or password has been entered. Please try again.</p>')
   }
 });
+ //try a diffrent way to compare login credentials try same as registration filter
+    //allowed to login
+    // res.cookie('user_Email', user_Email);
+    // res.redirect('/urls');
+
+//else {
+    //not allowed to login
+    
+    // console.log('Authentication failed for user:', user_Email);
+    // res.status(401).end('<p>An incorrect email or password has been entered. Please try again.</p>');//redirect failed
+
 
 //req.session.user_ID = user_ID; instead of cookies
 //Sign-out user when the Sign-out button is selected
