@@ -59,12 +59,14 @@ app.post('/urls_login', (req, res) => {
   console.log('Password:', password);
 
   if (users[user_Email] && users[user_Email].password === password) {
+    //try a diffrent way to compare login credentials 
     //allowed to login
     res.cookie('user_Email', user_Email);
     res.redirect('/urls');
+
   } else {
     //not allowed to login
-    // (user_Email !== user_Email || password !== password) redundant code
+    
     console.log('Authentication failed for user:', user_Email);
     res.status(401).end('<p>An incorrect email or password has been entered. Please try again.</p>');//redirect failed
   }
@@ -124,7 +126,7 @@ app.post('/register', (req, res) => {
     const user = users[userId];
     if (user.email === user_Email) {
       // we found a duplicate email
-      foundUser = user;
+      registeredUser = user;
     }
   }
 

@@ -1,3 +1,5 @@
+//no longer in use
+////////////////
 const user = {
   "Michelle_Flowers": {
     userName: "Michelle_Flowers",
@@ -10,7 +12,7 @@ const user = {
     password: 456
   },
 };
-
+/////////////////
 const users = {
   userRandomID: {
     id: "userRandomID",
