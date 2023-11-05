@@ -82,7 +82,8 @@ app.post('/urls_login', (req, res) => {
   if(!userMatch) {
     return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>')
   }
-  res.cookie('user_id', userId);
+  res.cookie('user_id', userId); // for id cookie
+  res.cookie('user_Email', user_Email);// got email cookie (logout button functionality)
   //set the user_id cookie with the matching user's random ID, then redirect to /urls.
   res.redirect('/urls');
 });
@@ -90,8 +91,8 @@ app.post('/urls_login', (req, res) => {
 //req.session.user_ID = user_ID; instead of cookies
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_Email');
-  res.redirect('/urls');
+  res.clearCookie('user_id'); //clear id cookie, not Id BUT not the value!
+  res.redirect('/urls_login'); //refactore to redirect to login not urls
 });
 
 //Delete User Cookie
