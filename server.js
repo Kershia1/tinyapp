@@ -51,10 +51,13 @@ res.render('urls_login', templateVars);
 });
 
 //Set cookie for login 
-app.post('/login', (req, res) => {
-  const user_Email = req.body.user_Email; 
+app.post('/urls_login', (req, res) => {
+  const user_Email = req.body.email; 
   const password = req.body.password;
-  // console.log('User Name:', user_ID); // I want this to be on the header?
+
+  console.log('User Email:', user_Email);
+  console.log('Password:', password);
+
   if (users[user_Email] && users[user_Email].password === password) {
     //allowed to login
     res.cookie('user_Email', user_Email);
@@ -62,6 +65,7 @@ app.post('/login', (req, res) => {
   } else {
     //not allowed to login
     // (user_Email !== user_Email || password !== password) redundant code
+    console.log('Authentication failed for user:', user_Email);
     res.status(401).end('<p>An incorrect email or password has been entered. Please try again.</p>');//redirect failed
   }
 });
