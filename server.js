@@ -43,7 +43,7 @@ app.set("views", path.join(__dirname, "views"));
 /////////////////////////////////////////////////
 
 //render login page
-app.get('/login', (req, res) => {
+app.get('/urls_login', (req, res) => {
   const templateVars = {
     users: undefined
   };
@@ -52,6 +52,7 @@ res.render('urls_login', templateVars);
 
 //Set cookie for login 
 app.post('/urls_login', (req, res) => {
+  // const user_ID = req.body.id; //If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
   const user_Email = req.body.email; 
   const password = req.body.password;
 
@@ -60,33 +61,31 @@ app.post('/urls_login', (req, res) => {
 
   let userMatch = false; 
   // test if this account exists 
+  let userId; //create a liminal space to store info
 
-  for (const userId in users) {
-    let user = users[userId];
-    if (user.email === user_Email && user.password === password) {
-      // allow login
+  //still using my e-mail at the filter to compar with
+  //remeber working with in the users obj therefore need to use id not ID to access key and return the values I am iterating for 
+  for (const id in users) {
+    let user = users[id];
+    if (user.email === user_Email) {
+      //if email given matches database
+      userId = id; //ReferenceError: id is not defined
+   
+      if (user.password === password) {
+        //if password given matches database
       userMatch = true;
-      res.cookie('user_Email', user_Email);
-      res.redirect('/urls');
+      // let userId = id; redundant code
       break;
-      //login failed
     } 
   }
+}
   if(!userMatch) {
-    return res.send('<p>An incorrect email or password has been entered. Please try again.</p>')
+    return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>')
   }
+  res.cookie('user_id', userId);
+  //set the user_id cookie with the matching user's random ID, then redirect to /urls.
+  res.redirect('/urls');
 });
- //try a diffrent way to compare login credentials try same as registration filter
-    //allowed to login
-    // res.cookie('user_Email', user_Email);
-    // res.redirect('/urls');
-
-//else {
-    //not allowed to login
-    
-    // console.log('Authentication failed for user:', user_Email);
-    // res.status(401).end('<p>An incorrect email or password has been entered. Please try again.</p>');//redirect failed
-
 
 //req.session.user_ID = user_ID; instead of cookies
 //Sign-out user when the Sign-out button is selected

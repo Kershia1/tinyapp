@@ -1,6 +1,22 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
+
+     <!-- Place if statement here ? if not logged in yet, before rendering header? -->
+
+     <% if (!user_Email) { %>
+    <!-- not logged in or registered yet-->
+    <a class="nav-item nav-link" href="/urls_login">Login Page</a>
+    <a class="nav-item nav-link" href="/register">Registration Page</a>
+
+     <!-- Logout Form will now be my else beacuse their already logged in -->
+     <% } else { %>
+      <form class="form-inline" action="/logout" method="POST">
+      <div class="form-group mb-2">
+        <label for="logout"></label>
+        <p class="navbar-text">Logged in as: <%= user_Email %></p>
+        <button type="submit" class="btn btn-primary">Logout</button>
+    <% } %>
     <button
       class="navbar-toggler"
       type="button"
@@ -20,14 +36,5 @@
         <a class="nav-item nav-link" href="/about">Notes, Citations, Thank you's</a>
       </div>
     </div>
-     <!-- Display email if logged in -->
-     <!-- Logout Form -->
-    <% if (user_Email) { %>
-      <form class="form-inline" action="/logout" method="POST">
-      <div class="form-group mb-2">
-        <label for="logout"></label>
-        <p class="navbar-text">Logged in as: <%= user_Email %></p>
-        <button type="submit" class="btn btn-primary">Logout</button>
-    <% } %>
   </nav>
 </header>
