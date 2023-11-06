@@ -1,17 +1,17 @@
 //no longer in use
 ////////////////
-const user = {
-  "Michelle_Flowers": {
-    userName: "Michelle_Flowers",
-    email: "Michelle_Flowers@example.com",
-    password: 789
-  },
-  "Danny_Trejo": {
-    userName: "Danny_Trejo",
-    email: "Danny_Trejo@example.com",
-    password: 456
-  },
-};
+// const user = {
+//   "Michelle_Flowers": {
+//     userName: "Michelle_Flowers",
+//     email: "Michelle_Flowers@example.com",
+//     password: 789
+//   },
+//   "Danny_Trejo": {
+//     userName: "Danny_Trejo",
+//     email: "Danny_Trejo@example.com",
+//     password: 456
+//   },
+// };
 /////////////////
 const users = {
   userRandomID: {
@@ -43,5 +43,37 @@ function generateRandomString(length) {
 }
 
 const randomString = generateRandomString(6);
+
+
+ //same concept as register and login
+ //return user by email with id key from users database
+const findUserEmail = (email) => {
+for (const userId in users) {
+  const user = users[userId];
+  if (email === user.Email) {
+  return user;
+}
+}
+return undefined;
+}
+
+//check to see if user exists in database by id key
+const savedId = (id) => {
+  const user = users[id];
+  if (user) {
+    return user;
+  }
+  return undefined;
+};
+
+// //check to see if e-mail exists by checking users database email key
+// const savedEmail = (emailProvided) => {
+//   for (const user in users) {
+//     if(emailProvided === ?)
+//   }
+// }
+
+
+
 
 module.exports = { urlDatabase, user, users, generateRandomString};

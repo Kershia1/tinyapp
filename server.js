@@ -44,7 +44,7 @@ app.set("views", path.join(__dirname, "views"));
 
 //render login page
 app.get('/urls_login', (req, res) => {
-  if (req.cookies.user.id) { // is id from users obj is true redirect
+  if (req.cookies.user && req.cookies.user.id) { //actully check for cookie and matching user id property
     res.redirect('/urls');
   } else { // if false redirect and render login page
     const templateVars = {
@@ -118,7 +118,7 @@ app.get("/urls", (req, res) => {
 // Render Registration Page
 //always remeber the status of the user no account, registered, and logged in ...
 app.get('/register', (req, res) => {
-  if (req.cookies.user_id) {
+  if (req.cookies.user && req.cookies.user.id) { //actully check for cookie and matching user id property
     res.redirect('/urls');
   } else {
     const templateVars = {
@@ -184,12 +184,12 @@ app.post('/urls/:id', (req, res) => {
 //Handler for post req to create a new shortURL, then add to database
 // not sure how to handle, don't quite understand the question
 app.post('/urls', (req, res) => {
-  if (req.cookies.user.id) { // is id from users obj is true redirect
+  if (req.cookies.user && req.cookies.user.id) { //actully check for cookie and matching user id property
   const shortURL = generateRandomString(6); // make random alphanumeric string.
   urlDatabase[shortURL] = req.body.longURL; //longURl to add to database
   res.redirect(`/urls/${shortURL}`); //newly created shortURL page 
-  // res.status(200).send("Added URL: " + req.body.longURL)
 } else {
+  (!req.cookies.user && !req.cookies.user.id)
   res.redirect('/login'); // is this the corerct placement within body?
   }
 });
@@ -207,15 +207,16 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get("/urls/new", (req, res) => {
-  if (req.cookies.user.id) { // is id from users obj is true redirect
+  if (req.cookies.user && req.cookies.user.id) { //actully check for cookie and matching user id property
   const user_Email = req.cookies.user_Email;
   const templateVars = {
     user_Email: user_Email
   };
+  console.log('logged in:', user_Email);
   res.render("urls_new", templateVars);
 } else {
-  res.redirect('/login'); // is this the corerct placement within body?
-}
+  res.redirect('/urls_login'); // is this the corerct placement within body?
+} //error 404 used /login not urls_login
 });
 
 //render the 'urls_show' page to display a specific URL
@@ -224,7 +225,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    user_ID: req.session.user_ID,
+    user_Id: req.session.user.id,
     user_Email: user_Email
   };
   res.render("urls_show", templateVars);
