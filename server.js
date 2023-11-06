@@ -32,7 +32,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
-app.use("/static", express.static("public")); 
+app.use("/static", express.static("public"));
 
 //Template used
 /////////////////////////////////////////////////
@@ -44,43 +44,45 @@ app.set("views", path.join(__dirname, "views"));
 
 //render login page
 app.get('/urls_login', (req, res) => {
-  const templateVars = {
-    users: undefined
-  };
-res.render('urls_login', templateVars);
+  if (req.cookies.user.id) { // is id from users obj is true redirect
+    res.redirect('/urls');
+  } else { // if false redirect and render login page
+    const templateVars = {
+      users: undefined
+    };
+    res.render('urls_login', templateVars);
+  }
 });
 
 //Set cookie for login 
 app.post('/urls_login', (req, res) => {
-  // const user_ID = req.body.id; //If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
-  const user_Email = req.body.email; 
+
+  const user_Email = req.body.email;
   const password = req.body.password;
 
   console.log('User Email:', user_Email);
   console.log('Password:', password);
 
-  let userMatch = false; 
+  let userMatch = false;
   // test if this account exists 
   let userId; //create a liminal space to store info
 
-  //still using my e-mail at the filter to compar with
-  //remeber working with in the users obj therefore need to use id not ID to access key and return the values I am iterating for 
   for (const id in users) {
     let user = users[id];
     if (user.email === user_Email) {
       //if email given matches database
       userId = id; //ReferenceError: id is not defined
-   
+
       if (user.password === password) {
         //if password given matches database
-      userMatch = true;
-      // let userId = id; redundant code
-      break;
-    } 
+        userMatch = true;
+        // let userId = id; redundant code
+        break;
+      }
+    }
   }
-}
-  if(!userMatch) {
-    return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>')
+  if (!userMatch) {
+    return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>');
   }
   res.cookie('user_id', userId); // for id cookie
   res.cookie('user_Email', user_Email);// got email cookie (logout button functionality)
@@ -102,7 +104,6 @@ app.get('/logout', (req, res) => {
 });
 //look at session option for logging out the user
 
-
 //Display User Name in header 
 app.get("/urls", (req, res) => {
   const user_Email = req.cookies.user_Email; // need to request the cookies here 
@@ -117,10 +118,14 @@ app.get("/urls", (req, res) => {
 // Render Registration Page
 //always remeber the status of the user no account, registered, and logged in ...
 app.get('/register', (req, res) => {
-  const templateVars = {
-    user_Email: undefined
-  };
-  res.render('urls_register', templateVars);
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user_Email: undefined
+    };
+    res.render('urls_register', templateVars);
+  }
 });
 
 //Duy's Happy Path intigrated in with my not happy path.
@@ -168,7 +173,6 @@ app.post('/register', (req, res) => {
   // res.redirect('/login');
 });
 
-
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
   const longURL = req.body.newLongURL; //adding new long URL
@@ -178,11 +182,16 @@ app.post('/urls/:id', (req, res) => {
 });
 
 //Handler for post req to create a new shortURL, then add to database
+// not sure how to handle, don't quite understand the question
 app.post('/urls', (req, res) => {
+  if (req.cookies.user.id) { // is id from users obj is true redirect
   const shortURL = generateRandomString(6); // make random alphanumeric string.
   urlDatabase[shortURL] = req.body.longURL; //longURl to add to database
   res.redirect(`/urls/${shortURL}`); //newly created shortURL page 
   // res.status(200).send("Added URL: " + req.body.longURL)
+} else {
+  res.redirect('/login'); // is this the corerct placement within body?
+  }
 });
 
 //delets selected URL from table of URLS
@@ -198,11 +207,15 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get("/urls/new", (req, res) => {
+  if (req.cookies.user.id) { // is id from users obj is true redirect
   const user_Email = req.cookies.user_Email;
   const templateVars = {
     user_Email: user_Email
   };
   res.render("urls_new", templateVars);
+} else {
+  res.redirect('/login'); // is this the corerct placement within body?
+}
 });
 
 //render the 'urls_show' page to display a specific URL
@@ -242,10 +255,10 @@ app.get("/u/:id", (req, res) => {
 //render urls index page to display all urls in database
 app.get("/urls", (req, res) => {
   const user_Email = req.cookies.user_Email;
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
     user_Email: user_Email
-   };
+  };
   res.render("urls_index", templateVars); //render in urls_index.ejs
 });
 
