@@ -4,7 +4,7 @@
 
      <!-- Place if statement here ? if not logged in yet, before rendering header? -->
 
-     <% if (!user_Email) { %>
+     <% if (!userEmail) { %>
     <!-- not logged in or registered yet-->
     <a class="nav-item nav-link" href="/urls_login">Login Page</a>
     <a class="nav-item nav-link" href="/register">Registration Page</a>
@@ -13,7 +13,7 @@
      <% } else { %>
       <form class="form-inline" action="/logout" method="POST">
       <div class="form-group mb-2">
-        <p class="navbar-text">Logged in as: <%= user_Email %></p>
+        <p class="navbar-text">Logged in as: <%= userEmail %></p>
         <button type="submit" class="btn btn-primary">Logout</button>
     <% } %>
     <button

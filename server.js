@@ -16,7 +16,7 @@ const PORT = 8080; // default port 8080
 // tried doing this de-structured didn't go well
 const helpers = require("./helpers");
 const urlDatabase = helpers.urlDatabase;
-const user = helpers.user;
+const userSpecificURLS = helpers.user;
 const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
 const path = require('path');
@@ -105,17 +105,23 @@ app.get('/logout', (req, res) => {
 
 //Display User Name in header 
 app.get("/urls", (req, res) => {
-  const userEmail = req.cookies.userEmail; // need to request the cookies here 
-  const templateVars = {
-    urls: urlDatabase,
-    userEmail: userEmail // do not request here in object
+  const userID = req.cookies.userID; // need the id to match in everything 
+  if (!userID) {
+    //dosen't match logged in user or just not logged in? I'm really struggeling with this new change and the extra depth gah !
+    res.status(401).send('Login required');
+  } else {
+    const userEmail = req.cookies.userEmail; // need to request the cookies here 
+    const userURLS = userSpecificURLS(userID);
+    const templateVars = {
+      urls: userURLS,
+      userEmail: userEmail // do not request here in object
+    };
+    console.log('Logged in as:', userEmail);
+    res.render("urls_index", templateVars);
   };
-  console.log('Logged in as:', userEmail);
-  res.render("urls_index", templateVars);
 });
 
 // Render Registration Page
-//always remeber the status of the user no account, registered, and logged in ...
 app.get('/register', (req, res) => {
   if (req.cookies.user && req.cookies.userID) { //actully check for cookie and matching user id property
     res.redirect('/urls');
@@ -171,79 +177,119 @@ app.post('/register', (req, res) => {
 });
 
 //Handler for post req to update a urlDatabase in database
+//this is a get req I wrote in the wrong spot GAHHHHHHH
 app.post('/urls/:id', (req, res) => {
-  const longURL = req.body.newLongURL; //adding new long URL
-  const shortURL = req.params.id; // setting params to get short url
-  urlDatabase[shortURL] = longURL; //store in database
-  res.redirect('/urls');
+  const userID = req.cookies.userID;
+  if (!userID) {
+    res.status(401).send('Login required');
+  } else {
+    const shortURL = req.params.id;
+    if (urlDatabase[shortURL]) {
+      if (urlDatabase[shortURL].userID === userID) {
+        // Get the updated longURL from the req body
+        const newLongURL = req.body.newLongURL;
+        urlDatabase[shortURL].longURL = newLongURL;
+        res.redirect('/urls');
+      } else {
+        res.status(403).send('You are not authorized to update this URL.');
+      }
+    } else {
+      res.status(404).send('URL not found');
+    }
+  }
 });
-
 //Handler for post req to create a new shortURL, then add to database
-// not sure how to handle, don't quite understand the question
-// to adapt function CRUD need a logged in user (userID)  and the corresponding longURL
 //new entry to add to database will be to be shortUrl = key, with .longURl obj, and userID becomes of the value.
 app.post('/urls', (req, res) => {
-  if (req.cookies.userID) { 
-  const shortURL = generateRandomString(6); 
-  const longURL = req.body.longURL;
-  const userID = req.cookies.user_ID;
-  
-  urlDatabase[shortURL] = {
-   //add these keys and values to the new nested database
-   longURL: longURL,
-   userID: userID
-  }
-  res.redirect(`/urls/${shortURL}`); //backtick for template literal
-  //newly created shortURL page 
-} else {
-  res.redirect('/urls_login');
+  if (req.cookies.userID) {
+    const shortURL = generateRandomString(6);
+    const longURL = req.body.longURL;
+    const userID = req.cookies.user_ID;
+
+    urlDatabase[shortURL] = {
+      //add these keys and values to the new nested database
+      longURL: longURL,
+      userID: userID
+    };
+    res.redirect(`/urls/${shortURL}`); //backtick for template literal
+    //newly created shortURL page 
+  } else {
+    res.redirect('/urls_login');
   }
 });
 
 //delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
-  const deleteUrl = req.params.id;
-  if (urlDatabase[deleteUrl].longURL) {
-    delete urlDatabase[deleteUrl].longURL;
-    res.redirect('/urls');
+  const userID = req.cookies.userID; // need the id to match in everything 
+  if (!userID) { // user id filter user dosn't own url 
+    res.status(401).send('Login or, registration required ');
   } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+    //get shortURL
+    const shortURL = req.params.id;
+//does it exist in database
+    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+      const deleteUrl = req.params.id;
+      delete urlDatabase[deleteUrl];
+      res.redirect('/urls');
+    } else {
+      res.status(403).send("You are not authorized to delete this entry.");
+    }
   }
 });
 
 //render new urls page
 app.get('/urls/new', (req, res) => {
   if (req.cookies.user && req.cookies.userID) { //actully check for cookie and matching user id property
-  const userEmail = req.cookies.userEmail;
-  const templateVars = {
-    userEmail: userEmail
-  };
-  console.log('logged in:', userEmail);
-  res.render('urls_new', templateVars);
-} else {
-  res.redirect('/urls_login'); // is this the corerct placement within body?
-} //error 404 used /login not urls_login
+    const userEmail = req.cookies.userEmail;
+    const templateVars = {
+      userEmail: userEmail
+    };
+    console.log('logged in:', userEmail);
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/urls_login'); // is this the corerct placement within body?
+  } //error 404 used /login not urls_login
 });
 
-//render the 'urls_show' page to display a specific URL
+//retrive user specific urls from the datatbase
 app.get('/urls/:id', (req, res) => {
-  const userEmail = req.cookies.userEmail;
-  const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id],
-    userID: req.session.user.id,
-    userEmail: userEmail
-  };
-  res.render('urls_show', templateVars);
+  const userID = req.cookies.userID; // need the id to match in everything 
+  if (!userID) { // user id filter 
+    res.status(401).send('Login or, registration required ');
+  } else {
+    //is there a url that  matches the user ?
+    const shortURL = req.params.id;
+    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+      // if the key for the short url absolutly matches the short url key and id values continue. basicaly this is def the users key
+      const userEmail = req.cookies.userEmail; // retrive the email cookie 
+      const templateVars = { // acessing the nested k : v ps 
+        id: shortURL, // access the key
+        longURL: urlDatabase[shortURL].longURL, // check the key with new route 
+        userEmail: userEmail //check the email
+      };
+      res.render('urls_show', templateVars);
+    } else {
+      //redirect if wrong user or not their url
+      res.status(403).send('You are not authorized to access this URL!');
+    }
+  }
 });
 
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.post('/urls/:id', (req, res) => {
-  const editURL = req.body.longURL;
-  if (urlDatabase[editURL].longURL) {
-    res.redirect('/urls');
+  const userID = req.cookies.userID; // need the id to match in everything 
+  if (!userID) { // user id filter 
+    res.status(401).send('Login or, registration required ');
   } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+    const shortURL = req.params.id;
+    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+      const editURL = req.body.longURL;
+      if (urlDatabase[editURL].longURL) {
+        res.redirect('/urls');
+      } else {
+        res.status(404).send("I'm sorry the page you are trying to access is not here.");
+      }
+    }
   }
 });
 
@@ -252,9 +298,9 @@ app.post('/urls/:id', (req, res) => {
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
   if (urlDatabase[shortURL]) {
-  const longURL = urlDatabase[shortURL].longURL;
-  const userID = urlDatabase[shortURL].userID;
-  // if (longURL) {
+    const longURL = urlDatabase[shortURL].longURL;
+    const userID = urlDatabase[shortURL].userID;
+    // if (longURL) {
     res.redirect(longURL);
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");;

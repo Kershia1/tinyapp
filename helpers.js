@@ -56,6 +56,18 @@ function generateRandomString(length) {
 
 const randomString = generateRandomString(6);
 
+function userSpecificURLS(id) {
+  const userURLS = {};
+  for (const shortURL in urlDatabase) {
+    //if the user id value matches the url key true 
+    if (urlDatabase[shortURL].userID === id) {
+      userURLS[shortURL] = urlDatabase[shortURL];
+      //moving out of nested obj to 1 level up
+    }
+  }
+  return userURLS;
+}
+
 
 //same concept as register and login
 //return user by email with id key from users database
@@ -88,4 +100,4 @@ const randomString = generateRandomString(6);
 
 
 
-module.exports = { urlDatabase, user, users, generateRandomString };
+module.exports = { urlDatabase, user, users, userSpecificURLS, generateRandomString };

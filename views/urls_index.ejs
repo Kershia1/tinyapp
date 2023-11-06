@@ -33,7 +33,7 @@
           <% for (let shortURL in urls) { %>
             <tr>
               <td><a href="<%= shortURL %>"><%= shortURL %></a></td>
-              <td><a href="<%= urls[shortURL] %>"><%= urls[shortURL] %></a></td>
+              <td><a href="<%= urls[shortURL] %>"><%= urls[shortURL].longURL %></a></td>
               <td><a href= "urls/<%= shortURL %>"> Edit </a></td>
               <td><a href= "urls/<%= shortURL %>"> Delete </a></td>
             </tr>
