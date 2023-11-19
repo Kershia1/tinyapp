@@ -16,7 +16,8 @@ const PORT = 8080; // default port 8080
 // tried doing this de-structured didn't go well
 const helpers = require("./helpers");
 const urlDatabase = helpers.urlDatabase;
-const userSpecificURLS = helpers.user;
+const userSpecificURLS = helpers.userSpecificURLS;
+//previously listed as obj, forgot it was a function
 const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
 const path = require('path');
@@ -44,6 +45,7 @@ app.set("views", path.join(__dirname, "views"));
 
 //render login page
 app.get('/urls_login', (req, res) => {
+  console.log('get the username:', users);
   if (req.cookies.user && req.cookies.userID) { //actully check for cookie and matching user id property
     res.redirect('/urls');
   } else { // if false redirect and render login page
@@ -56,9 +58,13 @@ app.get('/urls_login', (req, res) => {
 
 //Set cookie for login 
 app.post('/urls_login', (req, res) => {
+// console.log('rebody data:', req.body);
 
-  const userEmail = req.body.email;
-  const password = req.body.password;
+  const userEmail = req.body.userEmail;
+  const password = req.body.userPassword;
+  // console.log('user email :', userEmail);
+  // console.log('user password :', password);
+  // return res.send('test');
 
   console.log('User Email:', userEmail);
   console.log('Password:', password);
@@ -70,13 +76,12 @@ app.post('/urls_login', (req, res) => {
   for (const id in users) {
     let user = users[id];
     if (user.email === userEmail) {
-      //if email given matches database
-      userId = id; //ReferenceError: id is not defined
+      
+      userId = id;
 
       if (user.password === password) {
         //if password given matches database
         userMatch = true;
-        // let userId = id; redundant code
         break;
       }
     }
@@ -90,9 +95,14 @@ app.post('/urls_login', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/register', (req, res) => {
+  console.log('Received data:', req.body);
+});
+
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
   res.clearCookie('userID'); //clear id cookie, not Id BUT not the value!
+  res.clearCookie('userEmail')
   res.redirect('/urls_login'); //refactore to redirect to login not urls
 });
 
@@ -102,6 +112,10 @@ app.get('/logout', (req, res) => {
   res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
 });
 //look at session option for logging out the user
+
+
+/* Update GET /urls to only show the logged-in user's URLs using the urlsForUser function.*/
+////////////////////
 
 //Display User Name in header 
 app.get("/urls", (req, res) => {
@@ -137,11 +151,13 @@ app.get('/register', (req, res) => {
 // POST /register
 app.post('/register', (req, res) => {
   // pull the info off the body object
-  const userEmail = req.body.email; // email paras
-  const password = req.body.password;// password paras
+  const userEmail = req.body.userEmail; // email paras
+  const password = req.body.userPassword;// password paras
 
   // did we NOT receive an email and/or password
   if (!userEmail || !password) {
+    console.log(userEmail); // undefined 
+    console.log(password); //undefined
     return res.status(400).send('Both e-mail and a password must be provided to successfully register.');
   }
 
@@ -166,6 +182,7 @@ app.post('/register', (req, res) => {
   const newUser = {
     id: userID,
     email: userEmail,
+    password: password
     // password: bcrypt.hashSync(password, 10)
   };
 
@@ -175,6 +192,13 @@ app.post('/register', (req, res) => {
   res.cookie('userID', userID);
   res.redirect('/urls');
 });
+
+
+/* 
+ Update POST /urls/:id and POST /urls/:id/delete endpoints to only allow the owner (creator) of the URL to edit or delete it.POST /urls/:id should return a relevant error message if id does not exist.
+ POST /urls/:id should return a relevant error message if the user is not logged in.
+ POST /urls/:id should return a relevant error message if the user does not own the URL.*/
+////////////////////
 
 //Handler for post req to update a urlDatabase in database
 //this is a get req I wrote in the wrong spot GAHHHHHHH
@@ -218,6 +242,14 @@ app.post('/urls', (req, res) => {
   }
 });
 
+
+/*  Update POST /urls/:id and POST /urls/:id/delete endpoints to only allow the owner (creator) of the URL to edit or delete it.
+ POST /urls/:id/delete should return a relevant error message if id does not exist.
+ POST /urls/:id/delete should return a relevant error message if the user is not logged in.
+ POST /urls/:id/delete should return a relevant error message if the user does not own the URL.
+*/
+////////////////////
+
 //delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
   const userID = req.cookies.userID; // need the id to match in everything 
@@ -232,6 +264,7 @@ app.post('/urls/:id/delete', (req, res) => {
       delete urlDatabase[deleteUrl];
       res.redirect('/urls');
     } else {
+      //
       res.status(403).send("You are not authorized to delete this entry.");
     }
   }
@@ -251,6 +284,11 @@ app.get('/urls/new', (req, res) => {
   } //error 404 used /login not urls_login
 });
 
+/*
+Ensure that GET /urls/:id returns a relevant error message if the user is not logged in.
+Ensure that GET /urls/:id returns a relevant error message if the user does not own the URL. */
+////////////////////
+
 //retrive user specific urls from the datatbase
 app.get('/urls/:id', (req, res) => {
   const userID = req.cookies.userID; // need the id to match in everything 
@@ -261,11 +299,11 @@ app.get('/urls/:id', (req, res) => {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       // if the key for the short url absolutly matches the short url key and id values continue. basicaly this is def the users key
-      const userEmail = req.cookies.userEmail; // retrive the email cookie 
+      //const userEmail = req.cookies.userEmail; // retrive the email cookie 
       const templateVars = { // acessing the nested k : v ps 
         id: shortURL, // access the key
         longURL: urlDatabase[shortURL].longURL, // check the key with new route 
-        userEmail: userEmail //check the email
+        userID: userID //check the userID
       };
       res.render('urls_show', templateVars);
     } else {
@@ -274,6 +312,10 @@ app.get('/urls/:id', (req, res) => {
     }
   }
 });
+
+
+/* Update POST /urls/:id and POST /urls/:id/delete endpoints to only allow the owner (creator) of the URL to edit or delete it. */
+////////////////////
 
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.post('/urls/:id', (req, res) => {
@@ -295,6 +337,11 @@ app.post('/urls/:id', (req, res) => {
 
 //Redirection from short url alias to long url
 // potential for error handeling?
+
+
+/* */
+////////////////////
+//retrieve  a specific URL to Edit on the urls_shows pg
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
   if (urlDatabase[shortURL]) {

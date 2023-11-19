@@ -57,17 +57,20 @@ function generateRandomString(length) {
 const randomString = generateRandomString(6);
 
 function userSpecificURLS(id) {
-  const userURLS = {};
+  const usersURLS = {};
   for (const shortURL in urlDatabase) {
     //if the user id value matches the url key true 
     if (urlDatabase[shortURL].userID === id) {
-      userURLS[shortURL] = urlDatabase[shortURL];
+      usersURLS[shortURL] = urlDatabase[shortURL];
       //moving out of nested obj to 1 level up
     }
   }
-  return userURLS;
-}
+  return usersURLS;
+};
 
+
+/* Create a function named urlsForUser(id) to return URLs where the userID is equal to the id of the currently logged-in user.*/
+////////////////////
 
 //same concept as register and login
 //return user by email with id key from users database
