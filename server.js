@@ -4,13 +4,12 @@ const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 //Set-up
 ////////////////////////////////////////////////
 const app = express();
 const PORT = 8080; // default port 8080
-
 
 //Helper Function's
 /////////////////////////////////////////////////
@@ -46,7 +45,7 @@ app.set("views", path.join(__dirname, "views"));
 
 //render login page
 app.get('/urls_login', (req, res) => {
-  console.log('get the username:', users);
+  // console.log('get the username:', users);
   if (req.cookies.user && req.cookies.userID) {
     res.redirect('/urls');
   } else {
@@ -153,10 +152,6 @@ app.post('/register', (req, res) => {
 
   // did we NOT receive an email and/or password
   if (!userEmail || !password) {
-//let hashPassword = bcrypt.?(, password(8));
-//password: hashPassword
-    // console.log(userEmail); // undefined 
-    // console.log(password); //undefined
     return res.status(400).send('Both e-mail and a password must be provided to successfully register.');
   }
 
@@ -174,7 +169,7 @@ app.post('/register', (req, res) => {
   if (registeredUser) {
     return res.status(400).send('a user with that email already exists');
   }
-  
+
 const hashedPassword = bcrypt.hashSync(password, 10);
   // happy path! we can create the new user object
   const userID = generateRandomString(8);
