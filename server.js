@@ -4,6 +4,7 @@ const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
+const bcrypt = require("bcrypt");
 
 //Set-up
 ////////////////////////////////////////////////
@@ -76,10 +77,11 @@ app.post('/urls_login', (req, res) => {
   for (const id in users) {
     let user = users[id];
     if (user.email === userEmail) {
-      
       userId = id;
 
       if (user.password === password) {
+        // write like a promise?
+        //if (!bcrypt.compareSync(password, user.password))
         //if password given matches database
         userMatch = true;
         break;
@@ -147,8 +149,15 @@ app.get('/register', (req, res) => {
   }
 });
 
+
+
 //Duy's Happy Path intigrated in with my not happy path.
 // POST /register
+//let hashPassword = bcrypt.?(, password(8));
+
+
+
+//password: hashPassword
 app.post('/register', (req, res) => {
   // pull the info off the body object
   const userEmail = req.body.userEmail; // email paras
