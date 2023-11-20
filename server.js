@@ -47,9 +47,9 @@ app.set("views", path.join(__dirname, "views"));
 //render login page
 app.get('/urls_login', (req, res) => {
   console.log('get the username:', users);
-  if (req.cookies.user && req.cookies.userID) { //actully check for cookie and matching user id property
+  if (req.cookies.user && req.cookies.userID) {
     res.redirect('/urls');
-  } else { // if false redirect and render login page
+  } else {
     const templateVars = {
       users: undefined
     };
@@ -79,9 +79,7 @@ app.post('/urls_login', (req, res) => {
     if (user.email === userEmail) {
       userId = id;
 
-      if (user.password === password) {
-        // write like a promise?
-        //if (!bcrypt.compareSync(password, user.password))
+      if (!bcrypt.compareSync(password, user.password)) {
         //if password given matches database
         userMatch = true;
         break;
@@ -110,10 +108,9 @@ app.post('/logout', (req, res) => {
 
 //Delete email cookie
 app.get('/logout', (req, res) => {
-  res.clearCookie('userEmail'); // DELETE A COOKIE BY KEY
+  res.clearCookie('userEmail');
   res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
 });
-//look at session option for logging out the user
 
 
 /* Update GET /urls to only show the logged-in user's URLs using the urlsForUser function.*/
@@ -121,7 +118,7 @@ app.get('/logout', (req, res) => {
 
 //Display User Name in header 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies.userID; // need the id to match in everything 
+  const userID = req.cookies.userID;
   if (!userID) {
     res.status(401).send('Login required');
   } else {
@@ -147,9 +144,8 @@ app.get('/register', (req, res) => {
     res.render('urls_register', templateVars);
   }
 });
+
 // POST /register
-//let hashPassword = bcrypt.?(, password(8));
-//password: hashPassword
 app.post('/register', (req, res) => {
   // pull the info off the body object
   const userEmail = req.body.userEmail;
@@ -157,6 +153,8 @@ app.post('/register', (req, res) => {
 
   // did we NOT receive an email and/or password
   if (!userEmail || !password) {
+//let hashPassword = bcrypt.?(, password(8));
+//password: hashPassword
     // console.log(userEmail); // undefined 
     // console.log(password); //undefined
     return res.status(400).send('Both e-mail and a password must be provided to successfully register.');
@@ -176,14 +174,14 @@ app.post('/register', (req, res) => {
   if (registeredUser) {
     return res.status(400).send('a user with that email already exists');
   }
-
+  
+const hashedPassword = bcrypt.hashSync(password, 10);
   // happy path! we can create the new user object
   const userID = generateRandomString(8);
   const newUser = {
     id: userID,
     email: userEmail,
-    // password: password
-    password: bcrypt.hashSync(password, 10)
+    password: hashedPassword
   };
 
   // add the new user to the users object
