@@ -195,7 +195,7 @@ app.post('/register', (req, res) => {
 
 
 /* 
- Update POST /urls/:id and POST /urls/:id/delete endpoints to only allow the owner (creator) of the URL to edit or delete it.POST /urls/:id should return a relevant error message if id does not exist.
+ Update POST /urls/:id endpoint to only allow the owner (creator) of the URL to edit it.POST /urls/:id should return a relevant error message if id does not exist.
  POST /urls/:id should return a relevant error message if the user is not logged in.
  POST /urls/:id should return a relevant error message if the user does not own the URL.*/
 ////////////////////
@@ -205,6 +205,7 @@ app.post('/register', (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const userID = req.cookies.userID;
   if (!userID) {
+    //relevant error message if the user is not logged in.
     res.status(401).send('Login required');
   } else {
     const shortURL = req.params.id;
@@ -215,9 +216,11 @@ app.post('/urls/:id', (req, res) => {
         urlDatabase[shortURL].longURL = newLongURL;
         res.redirect('/urls');
       } else {
+        //relevant error message if id does not exist.
         res.status(403).send('You are not authorized to update this URL.');
       }
     } else {
+
       res.status(404).send('URL not found');
     }
   }
@@ -251,20 +254,21 @@ app.post('/urls', (req, res) => {
 ////////////////////
 
 //delets selected URL from table of URLS
+//Note to self: url reps an obj w/  longURL and userID(checking this property for permissions)
 app.post('/urls/:id/delete', (req, res) => {
-  const userID = req.cookies.userID; // need the id to match in everything 
-  if (!userID) { // user id filter user dosn't own url 
-    res.status(401).send('Login or, registration required ');
+  const userID = req.cookies.userID; // get ID of user from cookie 
+  if (!userID) { // user id filter user dosn't own url logged in or not?
+    res.status(401).send('Login or, registration required');
   } else {
     //get shortURL
     const shortURL = req.params.id;
-//does it exist in database
+//does it exist in database? Is the current user the owner of the URL?
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const deleteUrl = req.params.id;
-      delete urlDatabase[deleteUrl];
-      res.redirect('/urls');
+      const deleteUrl = req.params.id; //Already done on line 263 redundant?
+      delete urlDatabase[deleteUrl]; //delete specific url from the database
+      res.redirect('/urls');// redirect to appropiate location
     } else {
-      //
+      //current user not the owner fo the url or the specified url dosen't exist
       res.status(403).send("You are not authorized to delete this entry.");
     }
   }
