@@ -123,14 +123,13 @@ app.get('/logout', (req, res) => {
 app.get("/urls", (req, res) => {
   const userID = req.cookies.userID; // need the id to match in everything 
   if (!userID) {
-    //dosen't match logged in user or just not logged in? I'm really struggeling with this new change and the extra depth gah !
     res.status(401).send('Login required');
   } else {
-    const userEmail = req.cookies.userEmail; // need to request the cookies here 
+    const userEmail = req.cookies.userEmail;
     const userURLS = userSpecificURLS(userID);
     const templateVars = {
       urls: userURLS,
-      userEmail: userEmail // do not request here in object
+      userEmail: userEmail
     };
     console.log('Logged in as:', userEmail);
     res.render("urls_index", templateVars);
@@ -139,7 +138,7 @@ app.get("/urls", (req, res) => {
 
 // Render Registration Page
 app.get('/register', (req, res) => {
-  if (req.cookies.user && req.cookies.userID) { //actully check for cookie and matching user id property
+  if (req.cookies.user && req.cookies.userID) {
     res.redirect('/urls');
   } else {
     const templateVars = {
@@ -148,25 +147,18 @@ app.get('/register', (req, res) => {
     res.render('urls_register', templateVars);
   }
 });
-
-
-
-//Duy's Happy Path intigrated in with my not happy path.
 // POST /register
 //let hashPassword = bcrypt.?(, password(8));
-
-
-
 //password: hashPassword
 app.post('/register', (req, res) => {
   // pull the info off the body object
-  const userEmail = req.body.userEmail; // email paras
-  const password = req.body.userPassword;// password paras
+  const userEmail = req.body.userEmail;
+  const password = req.body.userPassword;
 
   // did we NOT receive an email and/or password
   if (!userEmail || !password) {
-    console.log(userEmail); // undefined 
-    console.log(password); //undefined
+    // console.log(userEmail); // undefined 
+    // console.log(password); //undefined
     return res.status(400).send('Both e-mail and a password must be provided to successfully register.');
   }
 
@@ -176,7 +168,6 @@ app.post('/register', (req, res) => {
   for (const userId in users) {
     const user = users[userId];
     if (user.email === userEmail) {
-      // we found a duplicate email
       registeredUser = user;
     }
   }
@@ -187,34 +178,25 @@ app.post('/register', (req, res) => {
   }
 
   // happy path! we can create the new user object
-  const userID = generateRandomString(8); //create random user name 8 of 8
+  const userID = generateRandomString(8);
   const newUser = {
     id: userID,
     email: userEmail,
-    password: password
-    // password: bcrypt.hashSync(password, 10)
+    // password: password
+    password: bcrypt.hashSync(password, 10)
   };
 
   // add the new user to the users object
   users[userID] = newUser;
-  console.log(users); //error handeling
+  //console.log(users);
   res.cookie('userID', userID);
   res.redirect('/urls');
 });
 
-
-/* 
- Update POST /urls/:id endpoint to only allow the owner (creator) of the URL to edit it.POST /urls/:id should return a relevant error message if id does not exist.
- POST /urls/:id should return a relevant error message if the user is not logged in.
- POST /urls/:id should return a relevant error message if the user does not own the URL.*/
-////////////////////
-
 //Handler for post req to update a urlDatabase in database
-//this is a get req I wrote in the wrong spot GAHHHHHHH
 app.post('/urls/:id', (req, res) => {
   const userID = req.cookies.userID;
   if (!userID) {
-    //relevant error message if the user is not logged in.
     res.status(401).send('Login required');
   } else {
     const shortURL = req.params.id;
@@ -225,7 +207,6 @@ app.post('/urls/:id', (req, res) => {
         urlDatabase[shortURL].longURL = newLongURL;
         res.redirect('/urls');
       } else {
-        //relevant error message if id does not exist.
         res.status(403).send('You are not authorized to update this URL.');
       }
     } else {
@@ -234,8 +215,8 @@ app.post('/urls/:id', (req, res) => {
     }
   }
 });
+
 //Handler for post req to create a new shortURL, then add to database
-//new entry to add to database will be to be shortUrl = key, with .longURl obj, and userID becomes of the value.
 app.post('/urls', (req, res) => {
   if (req.cookies.userID) {
     const shortURL = generateRandomString(6);
@@ -247,29 +228,18 @@ app.post('/urls', (req, res) => {
       longURL: longURL,
       userID: userID
     };
-    res.redirect(`/urls/${shortURL}`); //backtick for template literal
-    //newly created shortURL page 
+    res.redirect(`/urls/${shortURL}`);
   } else {
     res.redirect('/urls_login');
   }
 });
 
-
-/*  Update POST /urls/:id and POST /urls/:id/delete endpoints to only allow the owner (creator) of the URL to edit or delete it.
- POST /urls/:id/delete should return a relevant error message if id does not exist.
- POST /urls/:id/delete should return a relevant error message if the user is not logged in.
- POST /urls/:id/delete should return a relevant error message if the user does not own the URL.
-*/
-////////////////////
-
 //delets selected URL from table of URLS
-//Note to self: url reps an obj w/  longURL and userID(checking this property for permissions)
 app.post('/urls/:id/delete', (req, res) => {
-  const userID = req.cookies.userID; // get ID of user from cookie 
-  if (!userID) { // user id filter user dosn't own url logged in or not?
+  const userID = req.cookies.userID;
+  if (!userID) {
     res.status(401).send('Login or, registration required');
   } else {
-    //get shortURL
     const shortURL = req.params.id;
 //does it exist in database? Is the current user the owner of the URL?
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
@@ -285,7 +255,7 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get('/urls/new', (req, res) => {
-  if (req.cookies.user && req.cookies.userID) { //actully check for cookie and matching user id property
+  if (req.cookies.user && req.cookies.userID) {
     const userEmail = req.cookies.userEmail;
     const templateVars = {
       userEmail: userEmail
@@ -293,14 +263,9 @@ app.get('/urls/new', (req, res) => {
     console.log('logged in:', userEmail);
     res.render('urls_new', templateVars);
   } else {
-    res.redirect('/urls_login'); // is this the corerct placement within body?
-  } //error 404 used /login not urls_login
+    res.redirect('/urls_login');
+  }
 });
-
-/*
-Ensure that GET /urls/:id returns a relevant error message if the user is not logged in.
-Ensure that GET /urls/:id returns a relevant error message if the user does not own the URL. */
-////////////////////
 
 //retrive user specific urls from the datatbase
 app.get('/urls/:id', (req, res) => {
@@ -326,14 +291,10 @@ app.get('/urls/:id', (req, res) => {
   }
 });
 
-
-/* Update POST /urls/:id and POST /urls/:id/delete endpoints to only allow the owner (creator) of the URL to edit or delete it. */
-////////////////////
-
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.post('/urls/:id', (req, res) => {
-  const userID = req.cookies.userID; // need the id to match in everything 
-  if (!userID) { // user id filter 
+  const userID = req.cookies.userID;
+  if (!userID) {
     res.status(401).send('Login or, registration required ');
   } else {
     const shortURL = req.params.id;
@@ -348,19 +309,12 @@ app.post('/urls/:id', (req, res) => {
   }
 });
 
-//Redirection from short url alias to long url
-// potential for error handeling?
-
-
-/* */
-////////////////////
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
   if (urlDatabase[shortURL]) {
     const longURL = urlDatabase[shortURL].longURL;
     const userID = urlDatabase[shortURL].userID;
-    // if (longURL) {
     res.redirect(longURL);
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");;
@@ -374,7 +328,7 @@ app.get('/urls', (req, res) => {
     urls: urlDatabase,
     userEmail: userEmail
   };
-  res.render("urls_index", templateVars); //render in urls_index.ejs
+  res.render("urls_index", templateVars);
 });
 
 //route to render index 
@@ -388,13 +342,13 @@ app.get('/about', (req, res) => {
   const templateVars = {
     userEmail: userEmail
   };
-  res.render('about', templateVars); //render about
+  res.render('about', templateVars);
 });
 
 // sends a response with the url database sent as a json file 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-}); // JSON String => returns urlDatabase object at that point in time 
+});
 
 //Listener
 /////////////////////////////////////////////////
