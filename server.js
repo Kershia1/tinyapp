@@ -50,7 +50,7 @@ app.set("views", path.join(__dirname, "views"));
 //render login page
 app.get('/urls_login', (req, res) => {
   // console.log('get the username:', users);
-  if (req.cookies.user && req.cookies.userID) {
+  if (req.session.user && req.session.userID) {
     res.redirect('/urls');
   } else {
     const templateVars = {
@@ -118,11 +118,11 @@ app.get('/logout', (req, res) => {
 
 //Display User Name in header 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   if (!userID) {
     res.status(401).send('Login required');
   } else {
-    const userEmail = req.cookies.userEmail;
+    const userEmail = req.session.userEmail;
     const userURLS = userSpecificURLS(userID);
     const templateVars = {
       urls: userURLS,
@@ -135,7 +135,7 @@ app.get("/urls", (req, res) => {
 
 // Render Registration Page
 app.get('/register', (req, res) => {
-  if (req.cookies.user && req.cookies.userID) {
+  if (req.session.user && req.session.userID) {
     res.redirect('/urls');
   } else {
     const templateVars = {
@@ -189,7 +189,7 @@ const hashedPassword = bcrypt.hashSync(password, 10);
 
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   if (!userID) {
     res.status(401).send('Login required');
   } else {
@@ -212,10 +212,10 @@ app.post('/urls/:id', (req, res) => {
 
 //Handler for post req to create a new shortURL, then add to database
 app.post('/urls', (req, res) => {
-  if (req.cookies.userID) {
+  if (req.session.userID) {
     const shortURL = generateRandomString(6);
     const longURL = req.body.longURL;
-    const userID = req.cookies.user_ID;
+    const userID = req.session.user_ID;
 
     urlDatabase[shortURL] = {
       //add these keys and values to the new nested database
@@ -230,7 +230,7 @@ app.post('/urls', (req, res) => {
 
 //delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   if (!userID) {
     res.status(401).send('Login or, registration required');
   } else {
@@ -249,8 +249,8 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get('/urls/new', (req, res) => {
-  if (req.cookies.user && req.cookies.userID) {
-    const userEmail = req.cookies.userEmail;
+  if (req.session.user && req.session.userID) {
+    const userEmail = req.session.userEmail;
     const templateVars = {
       userEmail: userEmail
     };
@@ -263,7 +263,7 @@ app.get('/urls/new', (req, res) => {
 
 //retrive user specific urls from the datatbase
 app.get('/urls/:id', (req, res) => {
-  const userID = req.cookies.userID; // need the id to match in everything 
+  const userID = req.session.userID; // need the id to match in everything 
   if (!userID) { // user id filter 
     res.status(401).send('Login or, registration required ');
   } else {
@@ -271,7 +271,7 @@ app.get('/urls/:id', (req, res) => {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       // if the key for the short url absolutly matches the short url key and id values continue. basicaly this is def the users key
-      //const userEmail = req.cookies.userEmail; // retrive the email cookie 
+      //const userEmail = req.session.userEmail; // retrive the email cookie 
       const templateVars = { // acessing the nested k : v ps 
         id: shortURL, // access the key
         longURL: urlDatabase[shortURL].longURL, // check the key with new route 
@@ -287,7 +287,7 @@ app.get('/urls/:id', (req, res) => {
 
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.post('/urls/:id', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   if (!userID) {
     res.status(401).send('Login or, registration required ');
   } else {
@@ -306,7 +306,7 @@ app.post('/urls/:id', (req, res) => {
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
 
   if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
     const longURL = urlDatabase[shortURL].longURL;
@@ -320,8 +320,8 @@ app.get('/u/:id', (req, res) => {
 //render urls index page to display all urls in database
 //iterate over all URLs in the urlDatabase and filter them based on the user.
 app.get('/urls', (req, res) => {
-  const userID = req.cookies.userID;
-  const userEmail = req.cookies.userEmail;
+  const userID = req.session.userID;
+  const userEmail = req.session.userEmail;
 
   if (!userID) {
     res.status(401).send('Login needed');
@@ -344,7 +344,7 @@ app.get('/index', (req, res) => {
 
 //route to render about
 app.get('/about', (req, res) => {
-  const userEmail = req.cookies.userEmail;
+  const userEmail = req.session.userEmail;
   const templateVars = {
     userEmail: userEmail
   };
