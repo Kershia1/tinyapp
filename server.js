@@ -13,11 +13,13 @@ const PORT = 8080; // default port 8080
 
 //Helper Function's
 /////////////////////////////////////////////////
-// tried doing this de-structured didn't go well
 const helpers = require("./helpers");
 const urlDatabase = helpers.urlDatabase;
 const userSpecificURLS = helpers.userSpecificURLS;
 //previously listed as obj, forgot it was a function
+const emailExists = helpers.emailExists;
+const findUserByEmail = helpers.findUserEmail
+const findUserByID = helpers.findUserByID
 const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
 const path = require('path');
@@ -27,7 +29,9 @@ const path = require('path');
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
-//how to set-up session management
+
+//Session management
+/////////////////////////////////////////////////
 app.use(session({
   secret: 'b@dgerBADGERMushr00m',
   resave: false,
@@ -62,10 +66,7 @@ app.post('/urls_login', (req, res) => {
 
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
-  // console.log('user email :', userEmail);
-  // console.log('user password :', password);
-  // return res.send('test');
-
+ 
   console.log('User Email:', userEmail);
   console.log('Password:', password);
 
@@ -100,15 +101,15 @@ app.post('/register', (req, res) => {
 
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  res.clearCookie('userID'); //clear id cookie, not Id BUT not the value!
+  res.clearCookie('userID');
   res.clearCookie('userEmail')
-  res.redirect('/urls_login'); //refactore to redirect to login not urls
+  res.redirect('/urls_login');
 });
 
 //Delete email cookie
 app.get('/logout', (req, res) => {
   res.clearCookie('userEmail');
-  res.redirect('/urls'); //status(200).end('<p>Cookie is deleted!</p>');
+  res.redirect('/urls');
 });
 
 
@@ -305,7 +306,9 @@ app.post('/urls/:id', (req, res) => {
 //retrieve  a specific URL to Edit on the urls_shows pg
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
-  if (urlDatabase[shortURL]) {
+  const userID = req.cookies.userID;
+
+  if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
     const longURL = urlDatabase[shortURL].longURL;
     const userID = urlDatabase[shortURL].userID;
     res.redirect(longURL);
@@ -315,13 +318,23 @@ app.get('/u/:id', (req, res) => {
 });
 
 //render urls index page to display all urls in database
+//iterate over all URLs in the urlDatabase and filter them based on the user.
 app.get('/urls', (req, res) => {
+  const userID = req.cookies.userID;
   const userEmail = req.cookies.userEmail;
-  const templateVars = {
-    urls: urlDatabase,
-    userEmail: userEmail
-  };
-  res.render("urls_index", templateVars);
+
+  if (!userID) {
+    res.status(401).send('Login needed');
+  }
+
+  if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+    const userURLS = userSpecificURLS(userID);
+    const templateVars = {
+      urls: userURLS,
+      userEmail: userEmail
+    };
+    res.render("urls_index", templateVars);
+  }
 });
 
 //route to render index 
