@@ -55,7 +55,7 @@ function userSpecificURLS(id) {
 const findUserEmail = (email) => {
   for (const userId in users) {
     const user = users[userId];
-    if (email === user.Email) {
+    if (email === user.email) {
       return user;
     }
   }

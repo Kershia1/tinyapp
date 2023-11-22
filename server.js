@@ -50,11 +50,13 @@ app.set("views", path.join(__dirname, "views"));
 //render login page
 app.get('/urls_login', (req, res) => {
   // console.log('get the username:', users);
-  if (req.session.user && req.session.userID) {
+  if (req.session.userId) {
+  // if (req.session.user && req.session.userId) {
     res.redirect('/urls');
   } else {
     const templateVars = {
       users: undefined
+      // users:users[users.req.session.userId],
     };
     res.render('urls_login', templateVars);
   }
@@ -62,38 +64,51 @@ app.get('/urls_login', (req, res) => {
 
 //Set cookie for login 
 app.post('/urls_login', (req, res) => {
-// console.log('rebody data:', req.body);
+  console.log('rebody data:', req.body);
 
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
- 
+  const userId = findUserByEmail(userEmail, users);
+
   console.log('User Email:', userEmail);
   console.log('Password:', password);
 
-  let userMatch = false;
-  // test if this account exists 
-  let userId; //create a liminal space to store info
+  if ( !userEmail || ! password) {
+    return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>')
+  }
 
-  for (const id in users) {
-    let user = users[id];
-    if (user.email === userEmail) {
-      userId = id;
-
-      if (!bcrypt.compareSync(password, user.password)) {
-        //if password given matches database
-        userMatch = true;
-        break;
-      }
+  if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>');
+    } else {
+      req.session.userId = userId.id;
+      res.redirect('/urls');
     }
-  }
-  if (!userMatch) {
-    return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>');
-  }
-  res.cookie('userID', userId); // for id cookie
-  res.cookie('userEmail', userEmail);// got email cookie (logout button functionality)
-  //set the userID cookie with the matching user's random ID, then redirect to /urls.
-  res.redirect('/urls');
-});
+
+  // for (const id in users) {
+  //   let user = users[id];
+  //   if (user.email === userEmail) {
+  //     userId = id;
+
+      //   try {
+      //     bcrypt.compare(password, user.password);
+      //   } catch (error) {
+      //     return res.status(403).send('<p> You have enetered an incorrect e-mail or password.</p>');
+      //   }
+
+    //}
+    //error handling to find registration /login issue 
+    // if (!bcrypt.compareSync(password, user.password)) {
+    //   //if password given matches database
+    //   userMatch = true;
+    //   break;
+  });
+//   if (!userId) {
+//     return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>');
+//   }
+//   req.session.userId = userId;
+//   req.session.userEmail = userEmail;
+//   res.redirect('/urls');
+// });
 
 app.post('/register', (req, res) => {
   console.log('Received data:', req.body);
@@ -215,7 +230,7 @@ app.post('/urls', (req, res) => {
   if (req.session.userID) {
     const shortURL = generateRandomString(6);
     const longURL = req.body.longURL;
-    const userID = req.session.user_ID;
+    const userID = req.session.userId;
 
     urlDatabase[shortURL] = {
       //add these keys and values to the new nested database
@@ -327,14 +342,14 @@ app.get('/urls', (req, res) => {
     res.status(401).send('Login needed');
   }
 
-  if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+  //if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
     const userURLS = userSpecificURLS(userID);
     const templateVars = {
       urls: userURLS,
       userEmail: userEmail
     };
     res.render("urls_index", templateVars);
-  }
+  //}
 });
 
 //route to render index 
