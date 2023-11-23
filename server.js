@@ -1,8 +1,8 @@
 // Packages
 /////////////////////////////////////////////////
 const express = require("express");
-const session = require('express-session');
-const cookieParser = require("cookie-parser");
+//const session = require('express-session');
+const cookieSession = require("cookie-session");
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 
@@ -27,15 +27,15 @@ const path = require('path');
 //Installed Middleware
 /////////////////////////////////////////////////
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(morgan('dev'));
 
 //Session management
 /////////////////////////////////////////////////
-app.use(session({
-  secret: 'b@dgerBADGERMushr00m',
-  resave: false,
-  saveUninitialized: true
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  maxAge: 24 * 60 * 60 * 1000
 }));
 app.use("/static", express.static("public"));
 
@@ -68,8 +68,7 @@ app.post('/urls_login', (req, res) => {
 
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
-  const userId = findUserByEmail(userEmail, users);
-
+  
   console.log('User Email:', userEmail);
   console.log('Password:', password);
 
@@ -77,38 +76,13 @@ app.post('/urls_login', (req, res) => {
     return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>')
   }
 
-  if (!bcrypt.compareSync(password, user.password)) {
+  if (!bcrypt.compareSync(password, users.password)) {
       return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>');
     } else {
       req.session.userId = userId.id;
       res.redirect('/urls');
     }
-
-  // for (const id in users) {
-  //   let user = users[id];
-  //   if (user.email === userEmail) {
-  //     userId = id;
-
-      //   try {
-      //     bcrypt.compare(password, user.password);
-      //   } catch (error) {
-      //     return res.status(403).send('<p> You have enetered an incorrect e-mail or password.</p>');
-      //   }
-
-    //}
-    //error handling to find registration /login issue 
-    // if (!bcrypt.compareSync(password, user.password)) {
-    //   //if password given matches database
-    //   userMatch = true;
-    //   break;
   });
-//   if (!userId) {
-//     return res.status(403).send('<p>An incorrect email or password has been entered. Please try again.</p>');
-//   }
-//   req.session.userId = userId;
-//   req.session.userEmail = userEmail;
-//   res.redirect('/urls');
-// });
 
 app.post('/register', (req, res) => {
   console.log('Received data:', req.body);
@@ -116,14 +90,13 @@ app.post('/register', (req, res) => {
 
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  res.clearCookie('userID');
-  res.clearCookie('userEmail')
+  req.session = null;
   res.redirect('/urls_login');
 });
 
 //Delete email cookie
 app.get('/logout', (req, res) => {
-  res.clearCookie('userEmail');
+  res.session.userEmail = null;
   res.redirect('/urls');
 });
 
@@ -198,7 +171,7 @@ const hashedPassword = bcrypt.hashSync(password, 10);
   // add the new user to the users object
   users[userID] = newUser;
   //console.log(users);
-  res.cookie('userID', userID);
+  res.session.userID= userID;
   res.redirect('/urls');
 });
 
