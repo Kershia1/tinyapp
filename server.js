@@ -33,8 +33,10 @@ app.use(morgan('dev'));
 //Session management
 /////////////////////////////////////////////////
 app.use(cookieSession({
+  //keeping as close to bcrypt example in doc as possible.
+  //try user_id to make sessions like bycrypt docs?
   name: 'session',
-  keys: ['key1', 'key2'],
+  keys: ['suzie'],
   maxAge: 24 * 60 * 60 * 1000
 }));
 app.use("/static", express.static("public"));
@@ -43,6 +45,10 @@ app.use("/static", express.static("public"));
 /////////////////////////////////////////////////
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
+// Maybe try to login and use empty obj ?
+// const users = {};
+// const urlDatabase {};
 
 //Routing
 /////////////////////////////////////////////////
@@ -63,6 +69,29 @@ app.get('/urls_login', (req, res) => {
 });
 
 //Set cookie for login 
+// app.post('/urls_login', (req, res) => {
+//   console.log('rebody data:', req.body);
+
+//   const userEmail = req.body.userEmail;
+//   const password = req.body.userPassword;
+  
+//   console.log('User Email:', userEmail);
+//   console.log('Password:', password);
+
+//   if ( !userEmail || ! password) {
+//     return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>')
+//   }
+
+//   const user = findUserByEmail(userEmail);
+
+//   if (!bcrypt.compareSync(password, users.password)) {
+//       return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>');
+//     } else {
+//       req.session.userId = user.id;
+//       res.redirect('/urls');
+//     }
+//   });
+// Set cookie for login 
 app.post('/urls_login', (req, res) => {
   console.log('rebody data:', req.body);
 
@@ -72,17 +101,32 @@ app.post('/urls_login', (req, res) => {
   console.log('User Email:', userEmail);
   console.log('Password:', password);
 
-  if ( !userEmail || ! password) {
-    return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>')
+  console.log("entering first conditional");
+  if (!userEmail || !password) {
+    return res.status(400).send('<p> You have entered an incorrect email or password.</p>')
   }
 
-  if (!bcrypt.compareSync(password, users.password)) {
-      return res.status(400).send('<p> You have enetered an incorrect e-mail or password.</p>');
-    } else {
-      req.session.userId = userId.id;
-      res.redirect('/urls');
-    }
-  });
+  console.log("indUserByEmail");
+  const user = findUserByEmail(userEmail);
+
+  console.log("beginning bcrypt");
+
+  bcrypt.compare(password, user.password)
+  console.log("in bcrypt")
+    .then((result) => {
+      if (result) {
+        req.session.userId = user.id;
+        res.redirect('/urls');
+      } else {
+        return res.status(400).send('<p> You have entered an incorrect email or password.</p>');
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send('<p> An error occurred while comparing passwords.</p>');
+    });
+    console.log("exiting");
+});
 
 app.post('/register', (req, res) => {
   console.log('Received data:', req.body);
