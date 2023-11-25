@@ -53,6 +53,10 @@ app.set("views", path.join(__dirname, "views"));
 //Routing
 /////////////////////////////////////////////////
 
+
+//LOGIN
+/////////////////////////////////////////////////
+
 //render login page
 app.get('/urls_login', (req, res) => {
   // console.log('get the username:', users);
@@ -73,7 +77,7 @@ app.post('/urls_login', (req, res) => {
 
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
-  
+
   console.log('User Email:', userEmail);
   console.log('Password:', password);
 
@@ -94,7 +98,9 @@ app.post('/urls_login', (req, res) => {
         req.session.userId = user.id;
         res.redirect('/urls');
       } else {
-        return res.status(400).send('<p> You have entered an incorrect email or password.</p>');
+        return res
+        .status(400)
+        .send('<p> You have entered an incorrect email or password.</p>');
       }
     })
     .catch((error) => {
@@ -104,9 +110,9 @@ app.post('/urls_login', (req, res) => {
     console.log("exiting");
 });
 
-app.post('/register', (req, res) => {
-  console.log('Received data:', req.body);
-});
+
+//LOGOUT
+/////////////////////////////////////////////////
 
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
@@ -120,26 +126,8 @@ app.get('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-
-/* Update GET /urls to only show the logged-in user's URLs using the urlsForUser function.*/
-////////////////////
-
-//Display User Name in header 
-app.get("/urls", (req, res) => {
-  const userID = req.session.userId;
-  if (!userID) {
-    res.status(401).send('Login required');
-  } else {
-    const userEmail = req.session.userEmail;
-    const userURLS = userSpecificURLS(userID);
-    const templateVars = {
-      urls: userURLS,
-      userEmail: userEmail
-    };
-    console.log('Logged in as:', userEmail);
-    res.render("urls_index", templateVars);
-  };
-});
+//REGISTRATION
+/////////////////////////////////////////////////
 
 // Render Registration Page
 app.get('/register', (req, res) => {
@@ -175,6 +163,51 @@ const hashedPassword = bcrypt.hashSync(password, 10);
   res.redirect('/urls');
 });
 
+//URL HANDELING
+/////////////////////////////////////////////////
+
+
+//HEADER DISPLAY
+/////////////////////////////////////////////////
+
+//Display User Name in header 
+app.get("/urls", (req, res) => {
+  const userID = req.session.userId;
+
+  if (!userID) {
+    res.status(401).send('Login required');
+  } else {
+    const userEmail = req.session.userEmail;
+    const userURLS = userSpecificURLS(userID, urlDatabase);
+    const user = findUserByID(userID, users);
+    const templateVars = {
+      urls: userURLS,
+      user: users[userID]
+    };
+    console.log('Logged in as:', userEmail);
+    return res.render("urls_index", templateVars);
+  };
+});
+
+//Handler for post req to create a new shortURL, then add to database
+app.post('/urls', (req, res) => {
+  if (req.session.userId) {
+    const shortURL = generateRandomString(6);
+    const longURL = req.body.longURL;
+    const userID = req.session.userId;
+
+    urlDatabase[shortURL] = {
+      //add these keys and values to the new nested database
+      longURL: longURL,
+      userID: userID
+    };
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    res.redirect('/urls_login');
+  }
+});
+
+
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
   const userID = req.session.userId;
@@ -198,23 +231,6 @@ app.post('/urls/:id', (req, res) => {
   }
 });
 
-//Handler for post req to create a new shortURL, then add to database
-app.post('/urls', (req, res) => {
-  if (req.session.userId) {
-    const shortURL = generateRandomString(6);
-    const longURL = req.body.longURL;
-    const userID = req.session.userId;
-
-    urlDatabase[shortURL] = {
-      //add these keys and values to the new nested database
-      longURL: longURL,
-      userID: userID
-    };
-    res.redirect(`/urls/${shortURL}`);
-  } else {
-    res.redirect('/urls_login');
-  }
-});
 
 //delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
@@ -304,6 +320,10 @@ app.get('/u/:id', (req, res) => {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");;
   }
 });
+
+
+//PAGE RENDERING
+/////////////////////////////////////////////////
 
 //render urls index page to display all urls in database
 //iterate over all URLs in the urlDatabase and filter them based on the user.
