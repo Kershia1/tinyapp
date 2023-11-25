@@ -296,7 +296,8 @@ const user = findUserByID(userID, users);
   } else {
     const templateVars = {
       urls: urlDatabase,
-      user: users[userID]
+      user: users[userID],
+      userEmail: req.session.userEmail
   }
   console.log('logged in:', userEmail);
   res.render('urls_new', templateVars);
@@ -362,6 +363,14 @@ app.get('/u/:id', (req, res) => {
 
 //PAGE RENDERING
 /////////////////////////////////////////////////
+
+//render the login route for users 
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: users[req.session.userId],
+  };
+  res.render('urls_login', templateVars);
+})
 
 //render urls index page to display all urls in database
 //iterate over all URLs in the urlDatabase and filter them based on the user.
