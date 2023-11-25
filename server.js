@@ -73,42 +73,69 @@ app.get('/urls_login', (req, res) => {
 });
 
 app.post('/urls_login', (req, res) => {
-  console.log('reqbody data:', req.body);
+  const {userEmail, userPassword } = req.body;
+  const user = findUserByEmail(userEmail); // find user by email
 
-  const userEmail = req.body.userEmail;
-  const password = req.body.userPassword;
-
-  console.log('User Email:', userEmail);
-  console.log('Password:', password);
-
-  console.log("entering first conditional");
-  if (!userEmail || !password) {
-    return res.status(400).send('<p> You have entered an incorrect email or password.</p>')
+  if (!user) {
+      return res.status(400).send('We could not find a user with that email address.');
   }
 
-  console.log("findUserByEmail");
-  const user = findUserByEmail(userEmail);
-
-  console.log("beginning bcrypt");
-
-  bcrypt.compare(password, user.password)
-    .then((result) => {
-      console.log("in bcrypt");
-      if (result) {
-        req.session.userId = user.id;
-        res.redirect('/urls');
-      } else {
+  bcrypt.compare(userPassword, user.password, (err, result) => {
+    if (err) {
         return res
-        .status(400)
-        .send('<p> You have entered an incorrect email or password.</p>');
+        .status(500)
+        .send('An error occurred while comparing passwords.');
+    }
+
+      if (!result) { // if the result is false
+          return res
+          .status(400)
+          .send('You have entered an incorrect password.');
       }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send('<p> An error occurred while comparing passwords.</p>');
+          req.session.userId = user.id;
+          res.redirect('/urls');
+      // } else {
+      //     return res.status(400).send('You have entered an incorrect email or password.');
     });
-    console.log("exiting");
 });
+
+// app.post('/urls_login', (req, res) => {
+//   console.log('reqbody data:', req.body);
+
+//   const userEmail = req.body.userEmail;
+//   const password = req.body.userPassword;
+
+//   console.log('User Email:', userEmail);
+//   console.log('Password:', password);
+
+//   console.log("entering first conditional");
+//   if (!userEmail || !password) {
+//     return res.status(400).send('<p> You have entered an incorrect email or password.</p>')
+//   }
+
+//   console.log("findUserByEmail");
+//   const user = findUserByEmail(userEmail);
+
+//   console.log("beginning bcrypt");
+
+//   bcrypt.compare(password, user.password)
+//     .then((result) => {
+//       console.log("in bcrypt");
+//       if (result) {
+//         req.session.userId = user.id;
+//         res.redirect('/urls');
+//       } else {
+//         return res
+//         .status(400)
+//         .send('<p> You have entered an incorrect email or password.</p>');
+//       }
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       return res.status(500).send('<p> An error occurred while comparing passwords.</p>');
+//     });
+//     console.log("exiting");
+// });
 
 
 //LOGOUT
