@@ -167,10 +167,9 @@ const hashedPassword = bcrypt.hashSync(password, 10);
 /////////////////////////////////////////////////
 
 
-//HEADER DISPLAY
+//URLS
 /////////////////////////////////////////////////
 
-//Display User Name in header 
 app.get("/urls", (req, res) => {
   const userID = req.session.userId;
 
@@ -193,17 +192,22 @@ app.get("/urls", (req, res) => {
 app.post('/urls', (req, res) => {
   if (req.session.userId) {
     const shortURL = generateRandomString(6);
-    const longURL = req.body.longURL;
+    // const longURL = req.body.longURL;
     const userID = req.session.userId;
 
-    urlDatabase[shortURL] = {
-      //add these keys and values to the new nested database
-      longURL: longURL,
-      userID: userID
+    if (findUserByID(userID, users)) {
+      urlDatabase[shortURL] = {
+        //add these keys and values to the new nested database
+        longURL: req.body.longURL,
+        userID: userID
+      };
     };
     res.redirect(`/urls/${shortURL}`);
   } else {
-    res.redirect('/urls_login');
+    return res
+    .status(400)
+    .send("You must be logged in, to interact with your URLs.")
+    .redirect('/urls_login');
   }
 });
 
@@ -253,15 +257,18 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get('/urls/new', (req, res) => {
-  if (req.session.user && req.session.userId) {
-    const userEmail = req.session.userEmail;
-    const templateVars = {
-      userEmail: userEmail
-    };
-    console.log('logged in:', userEmail);
-    res.render('urls_new', templateVars);
+const userID = req.session.userId;
+const user = findUserByID(userID, users);
+
+  if ( user === null) {
+    return res.redirect('/login');
   } else {
-    res.redirect('/urls_login');
+    const templateVars = {
+      urls: urlDatabase,
+      user: users[userID]
+  }
+  console.log('logged in:', userEmail);
+  res.render('urls_new', templateVars);
   }
 });
 
