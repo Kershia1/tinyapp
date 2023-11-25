@@ -5,11 +5,9 @@
      <!-- Place if statement here ? if not logged in yet, before rendering header? -->
 
      <% if (!userEmail) { %>
-    <!-- not logged in or registered yet-->
     <a class="nav-item nav-link" href="/urls_login">Login Page</a>
     <a class="nav-item nav-link" href="/register">Registration Page</a>
 
-     <!-- Logout Form will now be my else beacuse their already logged in -->
      <% } else { %>
       <form class="form-inline" action="/logout" method="POST">
       <div class="form-group mb-2">

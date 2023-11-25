@@ -79,6 +79,7 @@ app.post('/urls_login', (req, res) => {
   if (!user) {
       return res.status(400).send('We could not find a user with that email address.');
   }
+  console.log('Hashed password in database:', user.password); // Log the hashed password
 
   bcrypt.compare(userPassword, user.password, (err, result) => {
     if (err) {
@@ -163,7 +164,7 @@ app.get('/register', (req, res) => {
   } else {
     const templateVars = {
       user: users[req.session.userId],
-      // userEmail: undefined
+      userEmail: undefined
     };
     res.render('urls_register', templateVars);
   }
@@ -175,18 +176,20 @@ app.post('/register', (req, res) => {
   const userID = generateRandomString(8);
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
+  const saltRounds = 10; //being specific so I understand what is happening
 
   // did we NOT receive an email and/or password or they allready are there
   if (!userEmail || !password || emailExists(userEmail, users)) {
     return res.status(400).send('An incorrect e-mail or password has been entered.');
   }
   // removed additional code already checking in the above statement
-const hashedPassword = bcrypt.hashSync(password, 10);
+const hashedPassword = bcrypt.hashSync(password, saltRounds);
   users[userID] = {
     id: userID,
     email: userEmail,
     password: hashedPassword
   };
+  req.session.userId = userID; //needed to create a session for the user facepalm moment
   res.redirect('/urls');
 });
 
@@ -208,7 +211,8 @@ app.get("/urls", (req, res) => {
     const user = findUserByID(userID, users);
     const templateVars = {
       urls: userURLS,
-      user: users[userID]
+      user: users[userID],
+      userEmail: userEmail
     };
     console.log('Logged in as:', userEmail);
     return res.render("urls_index", templateVars);
