@@ -169,6 +169,7 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   // pull the info off the body object
   const userID = generateRandomString(8);
+  console.log('Generated userID:', userID);
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
   const saltRounds = 10; //being specific so I understand what is happening
@@ -177,6 +178,9 @@ app.post('/register', (req, res) => {
   if (!userEmail || !password || emailExists(userEmail, users)) {
     return res.status(400).send('An incorrect e-mail or password has been entered.');
   }
+
+  console.log('Users before registration:', users);
+  console.log('Session before registration:', req.session);
   // removed additional code already checking in the above statement
 const hashedPassword = bcrypt.hashSync(password, saltRounds);
   users[userID] = {
@@ -185,9 +189,28 @@ const hashedPassword = bcrypt.hashSync(password, saltRounds);
     password: hashedPassword
   };
   req.session.userId = userID; //needed to create a session for the user facepalm moment
+  console.log('Users after registration:', users);
+  console.log('Session after registration:', req.session);
   res.redirect('/urls');
 });
 
+
+/**
+ * Generated userID: B9jV01tE
+Users before registration: {}
+Session before registration: Session { userId: 'Z96km2Vo' }
+Users after registration: {
+  B9jV01tE: {
+    id: 'B9jV01tE',
+    email: 'register@doribug.com',
+    password: '$2a$10$CRv2bwrTOG1M0CwKfNts2OasoLsvWKyEtpN7irIjNrmvhcTVwKba2'
+  }
+}
+Session after registration: Session { userId: 'B9jV01tE' }
+POST /register 302 138.218 ms - 54
+Logged in as: undefined
+GET /urls 200 21.792 ms - 2662
+ */
 //URL HANDELING
 /////////////////////////////////////////////////
 
