@@ -32,8 +32,8 @@ const findUserByEmail = helpers.findUserEmail
 const findUserByID = helpers.findUserByID
 //const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
-const path = require('path');
 */
+const path = require('path');
 
 //Installed Middleware
 /////////////////////////////////////////////////
@@ -144,7 +144,7 @@ app.post('/logout', (req, res) => {
 
 //Delete email cookie
 app.get('/logout', (req, res) => {
-  res.session.userEmail = null;
+  req.session.userEmail = null;
   res.redirect('/urls');
 });
 
