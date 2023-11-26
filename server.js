@@ -77,7 +77,7 @@ app.get('/urls_login', (req, res) => {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      users: undefined
+      users: users[req.session.userId]
       // users:users[users.req.session.userId],
     };
     res.render('urls_login', templateVars);
@@ -153,12 +153,13 @@ app.get('/logout', (req, res) => {
 
 // Render Registration Page
 app.get('/register', (req, res) => {
-  if (req.session.userId) {
+  if (req.session.userId && users[req.session.userId]) {
+    console.log('Logged in as:', users[req.session.userId].email);
     res.redirect('/urls');
   } else {
     const templateVars = {
       user: users[req.session.userId],
-      userEmail: undefined
+      userEmail: req.session.userEmail
     };
     res.render('urls_register', templateVars);
   }

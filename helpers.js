@@ -80,7 +80,7 @@ const findUserByID = (id, users) => {
 const emailExists = (emailProvided, users) => {
   for (const user in users) {
     if (emailProvided === users[user].email) {
-      return false;
+      return true;
     }
   }
 };

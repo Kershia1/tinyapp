@@ -30,7 +30,7 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let [shortURL, longURL] of Object.enteries(urls)) { %>
+          <% for (let [shortURL, longURL] of Object.entries(urls)) { %>
             <tr>
               <td><a href="<%= shortURL %>"><%= shortURL %></a></td>
               <td><a href="<%= urls[shortURL].longURL %>"><%= urls[shortURL].longURL %></a></td>
