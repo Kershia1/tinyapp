@@ -1,7 +1,6 @@
 // Packages
 /////////////////////////////////////////////////
 const express = require("express");
-//const session = require('express-session');
 const cookieSession = require("cookie-session");
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
@@ -21,31 +20,16 @@ const {
   generateRandomString,
   userSpecificURLS
  } = require('./helpers');
-
-/*
-const helpers = require("./helpers");
-//const urlDatabase = helpers.urlDatabase;
-const userSpecificURLS = helpers.userSpecificURLS;
-//previously listed as obj, forgot it was a function
-const emailExists = helpers.emailExists;
-const findUserByEmail = helpers.findUserEmail
-const findUserByID = helpers.findUserByID
-//const users = helpers.users;
-const generateRandomString = helpers.generateRandomString;
-*/
 const path = require('path');
 
 //Installed Middleware
 /////////////////////////////////////////////////
 app.use(express.urlencoded({ extended: true }));
-//app.use(cookieParser());
 app.use(morgan('dev'));
 
 //Session management
 /////////////////////////////////////////////////
 app.use(cookieSession({
-  //keeping as close to bcrypt example in doc as possible.
-  //try user_id to make sessions like bycrypt docs?
   name: 'session',
   keys: ['suzie'],
   maxAge: 24 * 60 * 60 * 1000
@@ -57,8 +41,7 @@ app.use("/static", express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Maybe try to login and use empty obj ?
-//will be an in-memory database object to store data, BUT.... will delete ever time server restarts, however this will work as the preexisting users are stored in the users object and I cannot seem to get the users object to work as a database with the passwords hashed.
+//In-memory Database
 const users = {};
 const urlDatabase = {};
 
@@ -73,12 +56,10 @@ const urlDatabase = {};
 app.get('/urls_login', (req, res) => {
   console.log('User in /urls_login:', users[req.session.userId]);
   if (req.session.userId) {
-  // if (req.session.user && req.session.userId) {
     res.redirect('/urls');
   } else {
     const templateVars = {
       users: users[req.session.userId]
-      // users:users[users.req.session.userId],
     };
     res.render('urls_login', templateVars);
   }
@@ -97,9 +78,9 @@ app.post('/urls_login', (req, res) => {
   console.log('Hashed password in database:', user.password); // Log the hashed password
 
   bcrypt.compare(userPassword, user.password, (err, result) => {
-    console.log('User Provided Password:', userPassword);
-    console.log('Hashed Password in Database:', user.password);
-    console.log('Password Comparison Result:', result);
+    // console.log('User Provided Password:', userPassword);
+    // console.log('Hashed Password in Database:', user.password);
+    // console.log('Password Comparison Result:', result);
 
     if (!result) {
       return res
@@ -157,24 +138,18 @@ app.post('/register', (req, res) => {
     return res.status(400).send('An incorrect e-mail or password has been entered.');
   }
 
-  // console.log('Users before registration:', users);
-  // console.log('Session before registration:', req.session);
-
-const hashedPassword = bcrypt.hashSync(password, saltRounds);
+  const hashedPassword = bcrypt.hashSync(password, saltRounds);
   users[userID] = {
     id: userID,
     email: userEmail,
     password: hashedPassword
   };
-  req.session.userId = userID; //needed to create a session for the user facepalm moment
+  req.session.userId = userID;
+  req.session.userEmail = userEmail;
   console.log('Users after registration:', users);
   console.log('Session after registration:', req.session);
   res.redirect('/urls');
 });
-
-//URL HANDELING
-/////////////////////////////////////////////////
-
 
 //URLS
 /////////////////////////////////////////////////
