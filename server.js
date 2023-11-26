@@ -71,7 +71,7 @@ const urlDatabase = {};
 
 //render login page
 app.get('/urls_login', (req, res) => {
-  // console.log('get the username:', users);
+  console.log('User in /urls_login:', users[req.session.userId]);
   if (req.session.userId) {
   // if (req.session.user && req.session.userId) {
     res.redirect('/urls');
@@ -86,6 +86,7 @@ app.get('/urls_login', (req, res) => {
 
 app.post('/urls_login', (req, res) => {
   const {userEmail, userPassword } = req.body;
+  console.log('User Provided Email:', userEmail);
   const user = findUserByEmail(userEmail); // find user by email
 
   if (!user) {
@@ -110,35 +111,13 @@ app.post('/urls_login', (req, res) => {
   });
 });
 
-
-    // if (err) {
-    //     return res
-    //     .status(500)
-    //     .send('An error occurred while comparing passwords.');
-    // }
-
-    //   if (!result) { // if the result is false
-    //       return res
-    //       .status(400)
-    //       .send('You have entered an incorrect password.');
-    //   }
-    //       req.session.userId = user.id;
-    //       res.redirect('/urls');
-    //   // } else {
-    //   //     return res.status(400).send('You have entered an incorrect email or password.');
-
-      // } else {
-  //   return res
-  //   .status(400)
-  //   .send('You have entered an incorrect email or password.');
-
-
 //LOGOUT
 /////////////////////////////////////////////////
 
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
-  req.session = null;
+  delete req.session.userId;
+  //req.session = null;
   res.redirect('/urls_login');
 });
 
@@ -153,6 +132,7 @@ app.get('/logout', (req, res) => {
 
 // Render Registration Page
 app.get('/register', (req, res) => {
+  //console.log('User in /register:', users[req.session.userId]);
   if (req.session.userId && users[req.session.userId]) {
     console.log('Logged in as:', users[req.session.userId].email);
     res.redirect('/urls');
@@ -167,21 +147,19 @@ app.get('/register', (req, res) => {
 
 // POST /register
 app.post('/register', (req, res) => {
-  // pull the info off the body object
   const userID = generateRandomString(8);
   console.log('Generated userID:', userID);
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
-  const saltRounds = 10; //being specific so I understand what is happening
+  const saltRounds = 10;
 
-  // did we NOT receive an email and/or password or they allready are there
   if (!userEmail || !password || emailExists(userEmail, users)) {
     return res.status(400).send('An incorrect e-mail or password has been entered.');
   }
 
-  console.log('Users before registration:', users);
-  console.log('Session before registration:', req.session);
-  // removed additional code already checking in the above statement
+  // console.log('Users before registration:', users);
+  // console.log('Session before registration:', req.session);
+
 const hashedPassword = bcrypt.hashSync(password, saltRounds);
   users[userID] = {
     id: userID,
@@ -220,6 +198,9 @@ GET /urls 200 21.792 ms - 2662
 
 app.get("/urls", (req, res) => {
   const userID = req.session.userId;
+  const user = users[userID];
+
+  console.log('User in /urls:', users[userID]);
 
   if (!userID) {
     res.status(401).send('Login required');
@@ -394,20 +375,19 @@ app.get('/login', (req, res) => {
 //iterate over all URLs in the urlDatabase and filter them based on the user.
 app.get('/urls', (req, res) => {
   const userID = req.session.userId;
-  const userEmail = req.session.userEmail;
+  //const userEmail = req.session.userEmail;
 
   if (!userID) {
     res.status(401).send('Login needed');
   }
-
-  //if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+    const user = users[userID];
     const userURLS = userSpecificURLS(userID);
     const templateVars = {
       urls: userURLS,
-      userEmail: userEmail
+      user: user
+      //userEmail: userEmail
     };
     res.render("urls_index", templateVars);
-  //}
 });
 
 //route to render index 
@@ -424,14 +404,6 @@ app.get('/about', (req, res) => {
   res.render('about', templateVars);
 });
 
-//route to render landing page
-// app.get('/', (req, res) => {
-//   if(req.session.userId) {
-//     res.redirect('/urls');
-//   } else {
-//     res.redirect('/login');
-//   }
-// });
 // sends a response with the url database sent as a json file 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
