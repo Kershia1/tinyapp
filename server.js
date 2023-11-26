@@ -329,15 +329,6 @@ app.get('/index', (req, res) => {
   res.render('index');
 });
 
-//route to render about
-app.get('/about', (req, res) => {
-  const userEmail = req.session.userEmail;
-  const templateVars = {
-    userEmail: userEmail
-  };
-  res.render('about', templateVars);
-});
-
 // sends a response with the url database sent as a json file 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
