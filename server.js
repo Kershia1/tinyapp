@@ -198,7 +198,7 @@ GET /urls 200 21.792 ms - 2662
 
 app.get("/urls", (req, res) => {
   const userID = req.session.userId;
-  const user = users[userID];
+ // const user = users[userID];
 
   console.log('User in /urls:', users[userID]);
 
@@ -207,10 +207,11 @@ app.get("/urls", (req, res) => {
   } else {
     const userEmail = req.session.userEmail;
     const userURLS = userSpecificURLS(userID, urlDatabase);
-    const user = findUserByID(userID, users);
+    const user = users[userID];
+    //const user = findUserByID(userID, users);
     const templateVars = {
       urls: userURLS,
-      user: users[userID],
+      user: user,
       userEmail: userEmail
     };
     console.log('Logged in as:', userEmail);
@@ -293,10 +294,12 @@ const user = findUserByID(userID, users);
   if ( user === null) {
     return res.redirect('/login');
   } else {
+    const userEmail = req.session.userEmail;
     const templateVars = {
       urls: urlDatabase,
       user: users[userID],
-      userEmail: req.session.userEmail
+      userEmail: userEmail
+      
   }
   console.log('logged in:', userEmail);
   res.render('urls_new', templateVars);
@@ -309,15 +312,13 @@ app.get('/urls/:id', (req, res) => {
   if (!userID) { // user id filter 
     res.status(401).send('Login or, registration required ');
   } else {
-    //is there a url that  matches the user ?
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      // if the key for the short url absolutly matches the short url key and id values continue. basicaly this is def the users key
-      //const userEmail = req.session.userEmail; // retrive the email cookie 
-      const templateVars = { // acessing the nested k : v ps 
-        id: shortURL, // access the key
-        longURL: urlDatabase[shortURL].longURL, // check the key with new route 
-        userID: userID //check the userID
+      const user = users[userID];
+      const templateVars = {
+        id: shortURL,
+        longURL: urlDatabase[shortURL].longURL,
+        user: user
       };
       res.render('urls_show', templateVars);
     } else {
