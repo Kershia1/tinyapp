@@ -172,23 +172,6 @@ const hashedPassword = bcrypt.hashSync(password, saltRounds);
   res.redirect('/urls');
 });
 
-
-/**
- * Generated userID: B9jV01tE
-Users before registration: {}
-Session before registration: Session { userId: 'Z96km2Vo' }
-Users after registration: {
-  B9jV01tE: {
-    id: 'B9jV01tE',
-    email: 'register@doribug.com',
-    password: '$2a$10$CRv2bwrTOG1M0CwKfNts2OasoLsvWKyEtpN7irIjNrmvhcTVwKba2'
-  }
-}
-Session after registration: Session { userId: 'B9jV01tE' }
-POST /register 302 138.218 ms - 54
-Logged in as: undefined
-GET /urls 200 21.792 ms - 2662
- */
 //URL HANDELING
 /////////////////////////////////////////////////
 
@@ -198,8 +181,6 @@ GET /urls 200 21.792 ms - 2662
 
 app.get("/urls", (req, res) => {
   const userID = req.session.userId;
- // const user = users[userID];
-
   console.log('User in /urls:', users[userID]);
 
   if (!userID) {
@@ -208,7 +189,6 @@ app.get("/urls", (req, res) => {
     const userEmail = req.session.userEmail;
     const userURLS = userSpecificURLS(userID, urlDatabase);
     const user = users[userID];
-    //const user = findUserByID(userID, users);
     const templateVars = {
       urls: userURLS,
       user: user,
@@ -223,12 +203,10 @@ app.get("/urls", (req, res) => {
 app.post('/urls', (req, res) => {
   if (req.session.userId) {
     const shortURL = generateRandomString(6);
-    // const longURL = req.body.longURL;
     const userID = req.session.userId;
 
     if (findUserByID(userID, users)) {
       urlDatabase[shortURL] = {
-        //add these keys and values to the new nested database
         longURL: req.body.longURL,
         userID: userID
       };
@@ -252,7 +230,6 @@ app.post('/urls/:id', (req, res) => {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL]) {
       if (urlDatabase[shortURL].userID === userID) {
-        // Get the updated longURL from the req body
         const newLongURL = req.body.newLongURL;
         urlDatabase[shortURL].longURL = newLongURL;
         res.redirect('/urls');
@@ -274,13 +251,11 @@ app.post('/urls/:id/delete', (req, res) => {
     res.status(401).send('Login or, registration required');
   } else {
     const shortURL = req.params.id;
-//does it exist in database? Is the current user the owner of the URL?
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const deleteUrl = req.params.id; //Already done on line 263 redundant?
-      delete urlDatabase[deleteUrl]; //delete specific url from the database
-      res.redirect('/urls');// redirect to appropiate location
+      const deleteUrl = req.params.id; 
+      delete urlDatabase[deleteUrl];
+      res.redirect('/urls');
     } else {
-      //current user not the owner fo the url or the specified url dosen't exist
       res.status(403).send("You are not authorized to delete this entry.");
     }
   }
@@ -308,8 +283,8 @@ const user = findUserByID(userID, users);
 
 //retrive user specific urls from the datatbase
 app.get('/urls/:id', (req, res) => {
-  const userID = req.session.userId; // need the id to match in everything 
-  if (!userID) { // user id filter 
+  const userID = req.session.userId;
+  if (!userID) {
     res.status(401).send('Login or, registration required ');
   } else {
     const shortURL = req.params.id;
@@ -322,7 +297,6 @@ app.get('/urls/:id', (req, res) => {
       };
       res.render('urls_show', templateVars);
     } else {
-      //redirect if wrong user or not their url
       res.status(403).send('You are not authorized to access this URL!');
     }
   }
@@ -376,7 +350,6 @@ app.get('/login', (req, res) => {
 //iterate over all URLs in the urlDatabase and filter them based on the user.
 app.get('/urls', (req, res) => {
   const userID = req.session.userId;
-  //const userEmail = req.session.userEmail;
 
   if (!userID) {
     res.status(401).send('Login needed');
@@ -386,7 +359,6 @@ app.get('/urls', (req, res) => {
     const templateVars = {
       urls: userURLS,
       user: user
-      //userEmail: userEmail
     };
     res.render("urls_index", templateVars);
 });
