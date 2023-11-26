@@ -6,17 +6,18 @@
 
      <% if (user) { %>
       Logged in as: <%= user.email %>
+      <form class="form-inline" action="/logout" method="POST">
+        <div class="form-group mb-2">
+          <p class="navbar-text">Logged in as: <%= userEmail %></p>
+          <button type="submit" class="btn btn-primary">Logout</button>
+          </div>
+        </form>
 
     <a class="nav-item nav-link" href="/urls_login">Login Page</a>
     <a class="nav-item nav-link" href="/register">Registration Page</a>
 
      <% } else { %>
-      <form class="form-inline" action="/logout" method="POST">
-      <div class="form-group mb-2">
-        <p class="navbar-text">Logged in as: <%= userEmail %></p>
-        <button type="submit" class="btn btn-primary">Logout</button>
-        </div>
-      </form>
+      <p class="navbar-text">Please log in</p>
     <% } %>
     <button
       class="navbar-toggler"
@@ -34,7 +35,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <a class="nav-item nav-link" href="/register">Create New Account</a>
-        <a class="nav-item nav-link" href="/about">Notes, Citations, Thank you's</a>
+        <a class="nav-item nav-link" href="/about">Thank you's</a>
       </div>
     </div>
   </nav>

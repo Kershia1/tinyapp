@@ -54,7 +54,6 @@ const urlDatabase = {};
 
 //render login page
 app.get('/urls_login', (req, res) => {
-  console.log('User in /urls_login:', users[req.session.userId]);
   if (req.session.userId) {
     res.redirect('/urls');
   } else {
@@ -67,21 +66,15 @@ app.get('/urls_login', (req, res) => {
 
 app.post('/urls_login', (req, res) => {
   const {userEmail, userPassword } = req.body;
-  console.log('User Provided Email:', userEmail);
-  const user = findUserByEmail(userEmail); // find user by email
+  const user = findUserByEmail(userEmail);
 
   if (!user) {
       return res
       .status(400)
       .send('We could not find a user with that email address.');
   }
-  console.log('Hashed password in database:', user.password); // Log the hashed password
-
+ 
   bcrypt.compare(userPassword, user.password, (err, result) => {
-    // console.log('User Provided Password:', userPassword);
-    // console.log('Hashed Password in Database:', user.password);
-    // console.log('Password Comparison Result:', result);
-
     if (!result) {
       return res
       .status(400)
@@ -98,7 +91,6 @@ app.post('/urls_login', (req, res) => {
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
   delete req.session.userId;
-  //req.session = null;
   res.redirect('/urls_login');
 });
 
@@ -129,7 +121,6 @@ app.get('/register', (req, res) => {
 // POST /register
 app.post('/register', (req, res) => {
   const userID = generateRandomString(8);
-  console.log('Generated userID:', userID);
   const userEmail = req.body.userEmail;
   const password = req.body.userPassword;
   const saltRounds = 10;
@@ -146,8 +137,6 @@ app.post('/register', (req, res) => {
   };
   req.session.userId = userID;
   req.session.userEmail = userEmail;
-  console.log('Users after registration:', users);
-  console.log('Session after registration:', req.session);
   res.redirect('/urls');
 });
 
@@ -156,7 +145,6 @@ app.post('/register', (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userID = req.session.userId;
-  console.log('User in /urls:', users[userID]);
 
   if (!userID) {
     res.status(401).send('Login required');
@@ -169,7 +157,6 @@ app.get("/urls", (req, res) => {
       user: user,
       userEmail: userEmail
     };
-    console.log('Logged in as:', userEmail);
     return res.render("urls_index", templateVars);
   };
 });
@@ -251,7 +238,6 @@ const user = findUserByID(userID, users);
       userEmail: userEmail
       
   }
-  console.log('logged in:', userEmail);
   res.render('urls_new', templateVars);
   }
 });
