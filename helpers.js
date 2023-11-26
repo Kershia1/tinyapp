@@ -1,30 +1,6 @@
-//Users 
-/////////////////
-// const users = {
-//   userRandomID: {
-//     id: "userRandomID",
-//     email: "user@example.com",
-//     password: "purple-monkey-dinosaur",
-//   },
-//   user2RandomID: {
-//     id: "user2RandomID",
-//     email: "user2@example.com",
-//     password: "dishwasher-funk",
-//   },
-// };
+// Description: Helper functions for TinyApp
 
-// new database to implement better access control 
-// const urlDatabase = {
-//   b6UTxQ: {
-//     longURL: "https://www.tsn.ca",
-//     userID: "aJ48lW",
-//   },
-//   i3BoGr: {
-//     longURL: "https://www.google.ca",
-//     userID: "aJ48lW",
-//   },
-// };
-
+//generateRandomString
 function generateRandomString(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let randomString = "";
@@ -38,6 +14,7 @@ function generateRandomString(length) {
 
 const randomString = generateRandomString(6);
 
+//userSpecificURLS
 function userSpecificURLS(id, urlDatabase) {
   const usersURLS = {};
   for (const shortURL in urlDatabase) {
@@ -64,8 +41,6 @@ const findUserByEmail = (email, users) => {
 
 
 //findUserByID
-////////////////////
-//check to see if user exists in database by id key
 const findUserByID = (id, users) => {
   const user = users[id];
   if (user) {
@@ -75,8 +50,6 @@ const findUserByID = (id, users) => {
 };
 
 //emailExists
-////////////////////
-//check to see if e-mail exists by checking users database email key
 const emailExists = (emailProvided, users) => {
   for (const user in users) {
     if (emailProvided === users[user].email) {
