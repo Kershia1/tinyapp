@@ -47,8 +47,9 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Maybe try to login and use empty obj ?
-// const users = {};
-// const urlDatabase {};
+//will be an in-memory database object to store data, BUT.... will delete ever time server restarts, however this will work as the preexisting users are stored in the users object and I cannot seem to get the users object to work as a database with the passwords hashed.
+const users = {};
+const urlDatabase = {};
 
 //Routing
 /////////////////////////////////////////////////
@@ -77,66 +78,48 @@ app.post('/urls_login', (req, res) => {
   const user = findUserByEmail(userEmail); // find user by email
 
   if (!user) {
-      return res.status(400).send('We could not find a user with that email address.');
+      return res
+      .status(400)
+      .send('We could not find a user with that email address.');
   }
   console.log('Hashed password in database:', user.password); // Log the hashed password
 
   bcrypt.compare(userPassword, user.password, (err, result) => {
-    if (err) {
-        return res
-        .status(500)
-        .send('An error occurred while comparing passwords.');
-    }
+    console.log('User Provided Password:', userPassword);
+    console.log('Hashed Password in Database:', user.password);
+    console.log('Password Comparison Result:', result);
 
-      if (!result) { // if the result is false
-          return res
-          .status(400)
-          .send('You have entered an incorrect password.');
-      }
-          req.session.userId = user.id;
-          res.redirect('/urls');
-      // } else {
-      //     return res.status(400).send('You have entered an incorrect email or password.');
-    });
+    if (!result) {
+      return res
+      .status(400)
+      .send('You have entered an incorrect password.');
+    }
+      req.session.userId = user.id;
+      res.redirect('/urls');
+  });
 });
 
-// app.post('/urls_login', (req, res) => {
-//   console.log('reqbody data:', req.body);
 
-//   const userEmail = req.body.userEmail;
-//   const password = req.body.userPassword;
+    // if (err) {
+    //     return res
+    //     .status(500)
+    //     .send('An error occurred while comparing passwords.');
+    // }
 
-//   console.log('User Email:', userEmail);
-//   console.log('Password:', password);
+    //   if (!result) { // if the result is false
+    //       return res
+    //       .status(400)
+    //       .send('You have entered an incorrect password.');
+    //   }
+    //       req.session.userId = user.id;
+    //       res.redirect('/urls');
+    //   // } else {
+    //   //     return res.status(400).send('You have entered an incorrect email or password.');
 
-//   console.log("entering first conditional");
-//   if (!userEmail || !password) {
-//     return res.status(400).send('<p> You have entered an incorrect email or password.</p>')
-//   }
-
-//   console.log("findUserByEmail");
-//   const user = findUserByEmail(userEmail);
-
-//   console.log("beginning bcrypt");
-
-//   bcrypt.compare(password, user.password)
-//     .then((result) => {
-//       console.log("in bcrypt");
-//       if (result) {
-//         req.session.userId = user.id;
-//         res.redirect('/urls');
-//       } else {
-//         return res
-//         .status(400)
-//         .send('<p> You have entered an incorrect email or password.</p>');
-//       }
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//       return res.status(500).send('<p> An error occurred while comparing passwords.</p>');
-//     });
-//     console.log("exiting");
-// });
+      // } else {
+  //   return res
+  //   .status(400)
+  //   .send('You have entered an incorrect email or password.');
 
 
 //LOGOUT

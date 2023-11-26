@@ -85,4 +85,4 @@ const emailExists = (emailProvided) => {
   }
 };
 
-module.exports = { emailExists, findUserByID, findUserEmail, generateRandomString, urlDatabase, userSpecificURLS, users };
+module.exports = { emailExists, findUserByID, findUserEmail, generateRandomString, /*urlDatabase,*/ userSpecificURLS, /*users*/ };
