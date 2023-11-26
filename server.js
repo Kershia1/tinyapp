@@ -13,16 +13,27 @@ const PORT = 8080; // default port 8080
 
 //Helper Function's
 /////////////////////////////////////////////////
+
+const {
+  emailExists,
+  findUserByID,
+  findUserByEmail,
+  generateRandomString,
+  userSpecificURLS
+ } = require('./helpers');
+
+/*
 const helpers = require("./helpers");
-const urlDatabase = helpers.urlDatabase;
+//const urlDatabase = helpers.urlDatabase;
 const userSpecificURLS = helpers.userSpecificURLS;
 //previously listed as obj, forgot it was a function
 const emailExists = helpers.emailExists;
 const findUserByEmail = helpers.findUserEmail
 const findUserByID = helpers.findUserByID
-const users = helpers.users;
+//const users = helpers.users;
 const generateRandomString = helpers.generateRandomString;
 const path = require('path');
+*/
 
 //Installed Middleware
 /////////////////////////////////////////////////

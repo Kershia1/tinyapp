@@ -52,7 +52,7 @@ function userSpecificURLS(id) {
 
 //findUserByEmail
 ////////////////////
-const findUserEmail = (email) => {
+const findUserByEmail = (email) => {
   for (const userId in users) {
     const user = users[userId];
     if (email === user.email) {
@@ -80,9 +80,15 @@ const findUserByID = (id) => {
 const emailExists = (emailProvided) => {
   for (const user in users) {
     if (emailProvided === users[user].email) {
-      return true;
+      return false;
     }
   }
 };
 
-module.exports = { emailExists, findUserByID, findUserEmail, generateRandomString, /*urlDatabase,*/ userSpecificURLS, /*users*/ };
+module.exports = {
+   emailExists,
+   findUserByID,
+   findUserByEmail,
+   generateRandomString,
+   userSpecificURLS
+  };
