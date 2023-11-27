@@ -19,7 +19,7 @@ const {
   getUserByEmail,
   generateRandomString,
   userSpecificURLS
- } = require('./helpers');
+} = require('./helpers');
 const path = require('path');
 
 //Installed Middleware
@@ -65,23 +65,23 @@ app.get('/urls_login', (req, res) => {
 });
 
 app.post('/urls_login', (req, res) => {
-  const {userEmail, userPassword } = req.body;
+  const { userEmail, userPassword } = req.body;
   const user = getUserByEmail(userEmail);
 
   if (!user) {
-      return res
+    return res
       .status(400)
       .send('We could not find a user with that email address.');
   }
- 
+
   bcrypt.compare(userPassword, user.password, (err, result) => {
     if (!result) {
       return res
-      .status(400)
-      .send('You have entered an incorrect password.');
+        .status(400)
+        .send('You have entered an incorrect password.');
     }
-      req.session.userId = user.id;
-      res.redirect('/urls');
+    req.session.userId = user.id;
+    res.redirect('/urls');
   });
 });
 
@@ -94,7 +94,7 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls_login');
 });
 
-//Delete email cookie
+//Delete email session when the Sign-out button is selected
 app.get('/logout', (req, res) => {
   req.session.userEmail = null;
   res.redirect('/urls');
@@ -117,7 +117,7 @@ app.get('/register', (req, res) => {
   }
 });
 
-// POST /register
+// Create new user and add to database
 app.post('/register', (req, res) => {
   const userID = generateRandomString(8);
   const userEmail = req.body.userEmail;
@@ -142,6 +142,7 @@ app.post('/register', (req, res) => {
 //URLS
 /////////////////////////////////////////////////
 
+//Handler for get req to display all urls in database
 app.get("/urls", (req, res) => {
   const userID = req.session.userId;
 
@@ -175,9 +176,9 @@ app.post('/urls', (req, res) => {
     res.redirect(`/urls/${shortURL}`);
   } else {
     return res
-    .status(400)
-    .send("You must be logged in, to interact with your URLs.")
-    .redirect('/urls_login');
+      .status(400)
+      .send("You must be logged in, to interact with your URLs.")
+      .redirect('/urls_login');
   }
 });
 
@@ -213,7 +214,7 @@ app.post('/urls/:id/delete', (req, res) => {
   } else {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const deleteUrl = req.params.id; 
+      const deleteUrl = req.params.id;
       delete urlDatabase[deleteUrl];
       res.redirect('/urls');
     } else {
@@ -224,10 +225,10 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //render new urls page
 app.get('/urls/new', (req, res) => {
-const userID = req.session.userId;
-const user = findUserByID(userID, users);
+  const userID = req.session.userId;
+  const user = findUserByID(userID, users);
 
-  if ( user === null) {
+  if (user === null) {
     return res.redirect('/login');
   } else {
     const userEmail = req.session.userEmail;
@@ -235,9 +236,9 @@ const user = findUserByID(userID, users);
       urls: urlDatabase,
       user: users[userID],
       userEmail: userEmail
-      
-  }
-  res.render('urls_new', templateVars);
+
+    };
+    res.render('urls_new', templateVars);
   }
 });
 
@@ -301,7 +302,7 @@ app.get('/u/:id', (req, res) => {
     const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
   } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here."); 
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
 });
 
@@ -322,23 +323,22 @@ app.get('/login', (req, res) => {
     user: users[req.session.userId],
   };
   res.render('urls_login', templateVars);
-})
+});
 
 //render urls index page to display all urls in database
-//iterate over all URLs in the urlDatabase and filter them based on the user.
 app.get('/urls', (req, res) => {
   const userID = req.session.userId;
 
   if (!userID) {
     res.status(401).send('Login needed');
   }
-    const user = users[userID];
-    const userURLS = userSpecificURLS(userID);
-    const templateVars = {
-      urls: userURLS,
-      user: user
-    };
-    res.render("urls_index", templateVars);
+  const user = users[userID];
+  const userURLS = userSpecificURLS(userID);
+  const templateVars = {
+    urls: userURLS,
+    user: user
+  };
+  res.render("urls_index", templateVars);
 });
 
 //route to render index 
