@@ -16,7 +16,7 @@ const PORT = 8080; // default port 8080
 const {
   emailExists,
   findUserByID,
-  findUserByEmail,
+  getUserByEmail,
   generateRandomString,
   userSpecificURLS
  } = require('./helpers');
@@ -66,7 +66,7 @@ app.get('/urls_login', (req, res) => {
 
 app.post('/urls_login', (req, res) => {
   const {userEmail, userPassword } = req.body;
-  const user = findUserByEmail(userEmail);
+  const user = getUserByEmail(userEmail);
 
   if (!user) {
       return res

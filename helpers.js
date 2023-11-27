@@ -27,9 +27,9 @@ function userSpecificURLS(id, urlDatabase) {
   return usersURLS;
 };
 
-//findUserByEmail
+//getUserByEmail
 ////////////////////
-const findUserByEmail = (email, users) => {
+const getUserByEmail = (email, users) => {
   for (const userId in users) {
     const user = users[userId];
     if (email === user.email) {
@@ -61,7 +61,7 @@ const emailExists = (emailProvided, users) => {
 module.exports = {
    emailExists,
    findUserByID,
-   findUserByEmail,
+   getUserByEmail,
    generateRandomString,
    userSpecificURLS
   };
