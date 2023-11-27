@@ -105,7 +105,6 @@ app.get('/logout', (req, res) => {
 
 // Render Registration Page
 app.get('/register', (req, res) => {
-  //console.log('User in /register:', users[req.session.userId]);
   if (req.session.userId && users[req.session.userId]) {
     console.log('Logged in as:', users[req.session.userId].email);
     res.redirect('/urls');
@@ -288,16 +287,34 @@ app.get('/u/:id', (req, res) => {
 
   if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
     const longURL = urlDatabase[shortURL].longURL;
-    const userID = urlDatabase[shortURL].userId;
     res.redirect(longURL);
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");;
   }
 });
 
+//retrieve and allow any user to access a specific URL wether logged in or not
+app.get('/u/:id', (req, res) => {
+  const shortURL = req.params.id;
+
+  if (urlDatabase[shortURL]) {
+    const longURL = urlDatabase[shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    res.status(404).send("I'm sorry the page you are trying to access is not here."); 
+  }
+});
 
 //PAGE RENDERING
 /////////////////////////////////////////////////
+
+//render the registration route for users
+app.get('/register', (req, res) => {
+  const templateVars = {
+    user: users[req.session.userId],
+  };
+  res.render('urls_register', templateVars);
+});
 
 //render the login route for users 
 app.get('/login', (req, res) => {
