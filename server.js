@@ -341,6 +341,15 @@ app.get('/urls', (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//landing page
+app.get('/', (req, res) => {
+  if (req.session.userId) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/urls_login');
+  }
+});
+
 //route to render index 
 app.get('/index', (req, res) => {
   res.render('index');
