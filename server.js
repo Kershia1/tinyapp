@@ -318,11 +318,6 @@ app.get('/u/:id', (req, res) => {
 //PAGE RENDERING
 /////////////////////////////////////////////////
 
-//render the registration route for users default landing page
-// app.get('/', (req, res) => {
-//   res.redirect('/urls_register');
-// });
-
 //render the login route for users 
 app.get('/login', (req, res) => {
   const templateVars = {
