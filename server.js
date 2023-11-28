@@ -52,6 +52,15 @@ const urlDatabase = {};
 //LOGIN
 /////////////////////////////////////////////////
 
+//landing page
+app.get('/', (req, res) => { 
+  if (req.session.userId) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/urls_login');
+  }
+});
+
 //render login page
 app.get('/urls_login', (req, res) => {
   if (req.session.userId) {
@@ -103,7 +112,7 @@ app.get('/logout', (req, res) => {
 //REGISTRATION
 /////////////////////////////////////////////////
 
-// Render Registration Page
+// Render Registration Page, register new user
 app.get('/register', (req, res) => {
   if (req.session.userId && users[req.session.userId]) {
     console.log('Logged in as:', users[req.session.userId].email);
@@ -309,13 +318,10 @@ app.get('/u/:id', (req, res) => {
 //PAGE RENDERING
 /////////////////////////////////////////////////
 
-//render the registration route for users
-app.get('/register', (req, res) => {
-  const templateVars = {
-    user: users[req.session.userId],
-  };
-  res.render('urls_register', templateVars);
-});
+//render the registration route for users default landing page
+// app.get('/', (req, res) => {
+//   res.redirect('/urls_register');
+// });
 
 //render the login route for users 
 app.get('/login', (req, res) => {
@@ -339,15 +345,6 @@ app.get('/urls', (req, res) => {
     user: user
   };
   res.render("urls_index", templateVars);
-});
-
-//landing page
-app.get('/', (req, res) => {
-  if (req.session.userId) {
-    res.redirect('/urls');
-  } else {
-    res.redirect('/urls_login');
-  }
 });
 
 //route to render index 
