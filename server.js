@@ -290,11 +290,10 @@ app.post('/urls/:id', (req, res) => {
   }
 });
 
-//retrieve  a specific URL to Edit on the urls_shows pg
+//retrieve  a specific URL the on the urls_shows pg
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
-  const userID = req.session.userID;
-
+  const userID = req.session.userId;
   if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
     const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
@@ -306,7 +305,6 @@ app.get('/u/:id', (req, res) => {
 //retrieve and allow any user to access a specific URL wether logged in or not
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
-
   if (urlDatabase[shortURL]) {
     const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
@@ -348,6 +346,18 @@ app.get('/urls', (req, res) => {
     user: user
   };
   res.render("urls_index", templateVars);
+});
+
+//render urls new page to create a new shortURL
+app.get('/:id', (req, res) => {
+  const shortURL = req.params.id;
+
+  if (urlDatabase[shortURL]) {
+    const longURL = urlDatabase[shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+  }
 });
 
 //route to render index 
