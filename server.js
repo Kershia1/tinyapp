@@ -318,6 +318,14 @@ app.get('/u/:id', (req, res) => {
 //PAGE RENDERING
 /////////////////////////////////////////////////
 
+//render the register route for users
+app.get('/register', (req, res) => {
+  const templateVars = {
+    user: users[req.session.userId],
+  };
+  res.render('urls_register', templateVars);
+});
+
 //render the login route for users 
 app.get('/login', (req, res) => {
   const templateVars = {
