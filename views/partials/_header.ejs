@@ -4,6 +4,7 @@
 
      <!-- Place if statement here ? if not logged in yet, before rendering header? -->
 
+     <div class ="d-flex justify content-center">
      <% if (user) { %>
       Logged in as: <%= user.email %>
       <form class="form-inline" action="/logout" method="POST">
@@ -19,6 +20,8 @@
       <p class="navbar-text">Already Registered? Please login here.</p>
       <a class="nav-item nav-link" href="/urls_login">Login Page</a>
     <% } %>
+     </div>
+     
     <button
       class="navbar-toggler"
       type="button"
