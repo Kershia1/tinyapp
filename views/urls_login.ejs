@@ -13,18 +13,23 @@ crossorigin="anonymous"
 <title>Login </title>
 </head>
 <body>
-<h1>Login</h1>
-<p>Please log in to access your account.</p>
+<h1 class=" text-center">Login</h1>
+<p class="text-center">Please log in to access your account.</p>
 <!-- METHOD=VERB; ACTION=PATH -->
+<form method="POST" action="/login"></form>
 <!-- E-mail Form -->
-<form method="POST" action="/urls_login">
-<label for="userEmail">Email</label>
+<div class="d-flex justify-content-center align-items center mb-3">
+<label for="userEmail"></label>
 <input class="form-control" id="userEmail" type="email" name="userEmail" placeholder="Email" autocomplete="on" style="width: 300px; margin: 1em">
+</div>
 <!-- Password Form -->
-<label for="userPassword">Password</label>
+<div class="d-flex justify-content-center align-items center mb-3">
+<label for="userPassword"></label>
 <input type="password" id="userPassword" name="userPassword" placeholder="password" autocomplete="on" style="width: 300px; margin: 1em">
-<input type="submit" autocomplete="on">
+</div>
+<div class="d-flex justify-content-center">
 <button type="submit" class="btn btn-primary">Click Here to Log In!</button>
+</div>
 </form>
 </body>
 </html>
