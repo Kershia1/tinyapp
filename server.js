@@ -182,7 +182,7 @@ app.post('/urls', (req, res) => {
         userID: userID
       };
     };
-    res.redirect(`/urls/${shortURL}`);
+    res.redirect(`/urls`);
   } else {
     return res
       .status(400)
@@ -244,8 +244,8 @@ app.get('/urls/new', (req, res) => {
     const templateVars = {
       urls: urlDatabase,
       user: users[userID],
-      userEmail: userEmail
-
+      userEmail: userEmail,
+      renderEditDeleteButtons: false 
     };
     res.render('urls_new', templateVars);
   }
@@ -263,7 +263,8 @@ app.get('/urls/:id', (req, res) => {
       const templateVars = {
         id: shortURL,
         longURL: urlDatabase[shortURL].longURL,
-        user: user
+        user: user,
+        renderEditDeleteButtons: true
       };
       res.render('urls_show', templateVars);
     } else {
@@ -290,18 +291,6 @@ app.post('/urls/:id', (req, res) => {
   }
 });
 
-//retrieve  a specific URL the on the urls_shows pg
-app.get('/u/:id', (req, res) => {
-  const shortURL = req.params.id;
-  const userID = req.session.userId;
-  if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-    const longURL = urlDatabase[shortURL].longURL;
-    res.redirect(longURL);
-  } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here.");;
-  }
-});
-
 //retrieve and allow any user to access a specific URL wether logged in or not
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
@@ -311,6 +300,17 @@ app.get('/u/:id', (req, res) => {
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
+});
+
+//link to redirect to the longURL
+app.get('/u/:shortURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL]) {
+    return res.redirect(urlDatabase[shortURL].longURL);
+  }
+  return res
+  .status(404)
+  .send('URL not found');
 });
 
 //PAGE RENDERING

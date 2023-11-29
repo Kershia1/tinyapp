@@ -22,8 +22,9 @@
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
-      </div>
-      <div class="card-footer text-muted"></div>
+
+        <% if (renderEditDeleteButtons) { %>
+
       <p>EDIT</p>
       <div class ="text-center"></div>
       <form class="form-inline mx-auto" action="/urls/<%= id %>" method="POST">
@@ -34,20 +35,22 @@
             type="text"
             name="newLongURL"
             placeholder="http://"
-            style="width: 300px; margin: 1em"
-          />
+            style="width: 300px; margin: 1em"/>
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
     </div>
+  </div>
 
-    <p>Delete</p>
-    <div class ="text-center"></div>
-    <form class="form-inline mx-auto" action="/urls/<%= id %>/delete" method="POST">
-        <button type="submit" class="btn btn-danger">Delete</button>
-        <p>Accidentally added the wrong URL ? You can delete it here before proceeding.</p>
-    </form>
-   </div>
+      <p>Delete</p>
+      <div class ="text-center"></div>
+      <form class="form-inline mx-auto" action="/urls/<%= id %>/delete" method="POST">
+          <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+      </div>
+      <% } %>
+    </div>
+    <div class="card-footer text-muted"></div>
   </div>
     <!-- Bootstrap JS -->
     <script
