@@ -1,52 +1,14 @@
-/**
- * Server Layout:
- * 
- * 1) Packages
- * 2) Set-up
- * 3) Helper Functions
- * 4) Installed Middleware
- * 5) Session Management
- * 6) Template Used
- * 7) In-memory Database
- * 8) Landing Page
- *  8.1)Login
- * a) get 
- * b) post
- * 8.2) Logout
- *  a) get
- * b) post
- * 8.3) Registration
- * a) get
- * b) post
- * 8.4) URLS
- * a) get
- * b) post
- * Delete
- *  get
- * post
- * Edit
- * get 
- * post
- *  * 8.5) Page Rendering
- * 9) Listener
- */
-
-
 // Packages
-/////////////////////////////////////////////////
 const express = require("express");
 const cookieSession = require("cookie-session");
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 
 //Set-up
-////////////////////////////////////////////////
 const app = express();
 const PORT = 8080; // default port 8080
 
 //Helper Function's
-/////////////////////////////////////////////////
-
 const {
   emailExists,
   findUserByID,
@@ -58,12 +20,10 @@ const path = require('path');
 const { url } = require("inspector");
 
 //Installed Middleware
-/////////////////////////////////////////////////
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 //Session management
-/////////////////////////////////////////////////
 app.use(cookieSession({
   name: 'session',
   keys: ['suzie'],
@@ -72,7 +32,6 @@ app.use(cookieSession({
 app.use("/static", express.static("public"));
 
 //Template used
-/////////////////////////////////////////////////
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -88,9 +47,6 @@ app.get('/', (req, res) => {
     res.redirect('/urls_login');
   }
 });
-
-//LOGIN
-/////////////////////////////////////////////////
 
 //render login page
 app.get('/urls_login', (req, res) => {
@@ -109,24 +65,17 @@ app.post('/urls_login', (req, res) => {
   const user = getUserByEmail(userEmail);
 
   if (!user) {
-    return res
-      .status(400)
-      .send('We could not find a user with that email address.');
+    return res.status(400).send('We could not find a user with that email address.');
   }
 
   bcrypt.compare(userPassword, user.password, (err, result) => {
     if (!result) {
-      return res
-        .status(400)
-        .send('You have entered an incorrect password.');
+      return res.status(400).send('You have entered an incorrect password.');
     }
     req.session.userId = user.id;
     res.redirect('/urls');
   });
 });
-
-//LOGOUT
-/////////////////////////////////////////////////
 
 //Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
@@ -139,9 +88,6 @@ app.get('/logout', (req, res) => {
   req.session.userEmail = null;
   res.redirect('/urls');
 });
-
-//REGISTRATION
-/////////////////////////////////////////////////
 
 // Render Registration Page, register new user
 app.get('/register', (req, res) => {
@@ -179,9 +125,6 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
-//URLS
-/////////////////////////////////////////////////
-
 //Handler for get req to display all urls in database
 app.get('/urls', (req, res) => {
   const userID = req.session.userId;
@@ -215,13 +158,9 @@ app.post('/urls', (req, res) => {
     };
     res.redirect('/urls');
   } else {
-    return res
-      .status(400)
-      .send("You must be logged in, to interact with your URLs.")
-      .redirect('/urls_login');
+    return res.status(400).send("You must be logged in, to interact with your URLs.").redirect('/urls_login');
   }
 });
-
 
 //Handler for post req to update a urlDatabase in database
 app.post('/urls/:id', (req, res) => {
@@ -239,7 +178,6 @@ app.post('/urls/:id', (req, res) => {
         res.status(403).send('You are not authorized to update this URL.');
       }
     } else {
-
       res.status(404).send('URL not found');
     }
   }
@@ -253,7 +191,6 @@ app.post('/urls/:id/delete', (req, res) => {
     res.status(401).send('Login or, registration required');
   } else {
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      //const deleteUrl = req.params.id;
       delete urlDatabase[shortURL];
       res.redirect('/urls');
     } else {
@@ -272,12 +209,9 @@ app.post('/urls/:id/edit', (req, res) => {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       urlDatabase[shortURL].longURL = req.body.longURL;
-      // const editURL = req.body.longURL;
-      // if (urlDatabase[editURL].longURL) {
-      res.redirect(`/urls/${shortURL}`); //redirect to the urls_show page pulled from old code in repo 
+        `/urls/${shortURL}`
       } else {
         res.status(404).send("I'm sorry the page you are trying to access is not here.");
-      // }
     }
   }
 });
@@ -316,9 +250,7 @@ app.get('/urls/:id', (req, res) => {
       };
       res.render('urls_show', templateVars);
     } else {
-      res
-        .status(403)
-        .send('You are not authorized to access this URL!');
+      res.status(403).send('You are not authorized to access this URL!');
     }
   }
 });
@@ -330,14 +262,9 @@ app.get('/u/:id', (req, res) => {
     const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
   } else {
-    res
-      .status(404)
-      .send("I'm sorry the page you are trying to access is not here.");
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
 });
-
-//PAGE RENDERING
-/////////////////////////////////////////////////
 
 //render the register route for users
 app.get('/register', (req, res) => {
@@ -393,8 +320,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//Listener
-/////////////////////////////////////////////////
+//listen on port 8080
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
