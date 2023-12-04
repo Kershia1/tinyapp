@@ -274,7 +274,7 @@ app.post('/urls/:id/edit', (req, res) => {
       urlDatabase[shortURL].longURL = req.body.longURL;
       // const editURL = req.body.longURL;
       // if (urlDatabase[editURL].longURL) {
-      res.redirect('/urls');
+      res.redirect(`/urls/${shortURL}`); //redirect to the urls_show page pulled from old code in repo 
       } else {
         res.status(404).send("I'm sorry the page you are trying to access is not here.");
       // }
