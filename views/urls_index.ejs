@@ -15,6 +15,13 @@
       crossorigin="anonymous"
     />
     <title>TinyApp</title>
+    <style>
+      .full-width {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -22,6 +29,7 @@
     </header>
     <main style="margin: 1em;">
       <h3>My URLs</h3>
+      <hr class=""full-width"> <!-- looks weird is self closing -->
       <table class="table">
         <thead>
           <tr>
@@ -38,14 +46,14 @@
               <!-- Edit form -->
               <td>
                 <form action="/urls/<%= shortURL %>/edit" method="POST">
-                  <button type="submit">Edit</button>
+                  <button type="submit" class="btn btn-success">Edit</button>
                 </form>
               </td>
           
               <!-- Delete form -->
               <td>
                 <form action="/urls/<%= shortURL %>/delete" method="POST">
-                  <button type="submit">Delete</button>
+                  <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </td>
             </tr>
