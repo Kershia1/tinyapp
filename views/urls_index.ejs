@@ -34,8 +34,20 @@
             <tr>
               <td><a href="<%= shortURL %>"><%= shortURL %></a></td>
               <td><a href="<%= urls[shortURL].longURL %>"><%= urls[shortURL].longURL %></a></td>
-              <td><a href= "urls/<%= shortURL %>"> Edit </a></td>
-              <td><a href= "urls/<%= shortURL %>"> Delete </a></td>
+          
+              <!-- Edit form -->
+              <td>
+                <form action="/urls/<%= shortURL %>/edit" method="POST">
+                  <button type="submit">Edit</button>
+                </form>
+              </td>
+          
+              <!-- Delete form -->
+              <td>
+                <form action="/urls/<%= shortURL %>/delete" method="POST">
+                  <button type="submit">Delete</button>
+                </form>
+              </td>
             </tr>
           <% } %>
         </tbody>

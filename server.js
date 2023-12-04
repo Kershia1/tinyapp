@@ -55,6 +55,7 @@ const {
   userSpecificURLS
 } = require('./helpers');
 const path = require('path');
+const { url } = require("inspector");
 
 //Installed Middleware
 /////////////////////////////////////////////////
@@ -244,17 +245,16 @@ app.post('/urls/:id', (req, res) => {
   }
 });
 
-//delets selected URL from table of URLS
+//delets a logged in usersURL selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
-  const shortURL = req.params.shortURL; //? 
+  const shortURL = req.params.id;
   const userID = req.session.userId;
   if (!userID) {
     res.status(401).send('Login or, registration required');
   } else {
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const deleteUrl = req.params.id;
-      delete urlDatabase[deleteUrl];
-      //const currentPath = req.body.currentPath || '/urls';
+      //const deleteUrl = req.params.id;
+      delete urlDatabase[shortURL];
       res.redirect('/urls');
     } else {
       res.status(403).send("You are not authorized to delete this entry.");
@@ -271,14 +271,13 @@ app.post('/urls/:id/edit', (req, res) => {
   } else {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const editURL = req.body.longURL;
-      if (urlDatabase[editURL].longURL) {
-        res.redirect('/urls');
+      urlDatabase[shortURL].longURL = req.body.longURL;
+      // const editURL = req.body.longURL;
+      // if (urlDatabase[editURL].longURL) {
+      res.redirect('/urls');
       } else {
-        res
-          .status(404)
-          .send("I'm sorry the page you are trying to access is not here.");
-      }
+        res.status(404).send("I'm sorry the page you are trying to access is not here.");
+      // }
     }
   }
 });
@@ -296,7 +295,6 @@ app.get('/urls/new', (req, res) => {
       urls: urlDatabase,
       user: users[userID],
       userEmail: userEmail,
-      renderEditDeleteButtons: false
     };
     res.render('urls_new', templateVars);
   }
@@ -315,8 +313,6 @@ app.get('/urls/:id', (req, res) => {
         id: shortURL,
         longURL: urlDatabase[shortURL].longURL,
         user: user,
-        renderEditDeleteButtons: true,
-        currentPath: req.originalUrl
       };
       res.render('urls_show', templateVars);
     } else {
