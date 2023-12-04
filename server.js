@@ -1,3 +1,37 @@
+/**
+ * Server Layout:
+ * 
+ * 1) Packages
+ * 2) Set-up
+ * 3) Helper Functions
+ * 4) Installed Middleware
+ * 5) Session Management
+ * 6) Template Used
+ * 7) In-memory Database
+ * 8) Landing Page
+ *  8.1)Login
+ * a) get 
+ * b) post
+ * 8.2) Logout
+ *  a) get
+ * b) post
+ * 8.3) Registration
+ * a) get
+ * b) post
+ * 8.4) URLS
+ * a) get
+ * b) post
+ * Delete
+ *  get
+ * post
+ * Edit
+ * get 
+ * post
+ *  * 8.5) Page Rendering
+ * 9) Listener
+ */
+
+
 // Packages
 /////////////////////////////////////////////////
 const express = require("express");
@@ -45,21 +79,17 @@ app.set("views", path.join(__dirname, "views"));
 const users = {};
 const urlDatabase = {};
 
-//Routing
-/////////////////////////////////////////////////
-
-
-//LOGIN
-/////////////////////////////////////////////////
-
 //landing page
-app.get('/', (req, res) => { 
+app.get('/', (req, res) => {
   if (req.session.userId) {
     res.redirect('/urls');
   } else {
     res.redirect('/urls_login');
   }
 });
+
+//LOGIN
+/////////////////////////////////////////////////
 
 //render login page
 app.get('/urls_login', (req, res) => {
@@ -152,7 +182,7 @@ app.post('/register', (req, res) => {
 /////////////////////////////////////////////////
 
 //Handler for get req to display all urls in database
-app.get("/urls", (req, res) => {
+app.get('/urls', (req, res) => {
   const userID = req.session.userId;
 
   if (!userID) {
@@ -166,7 +196,7 @@ app.get("/urls", (req, res) => {
       user: user,
       userEmail: userEmail
     };
-    return res.render("urls_index", templateVars);
+    return res.render('urls_index', templateVars);
   };
 });
 
@@ -182,7 +212,7 @@ app.post('/urls', (req, res) => {
         userID: userID
       };
     };
-    res.redirect(`/urls`);
+    res.redirect('/urls');
   } else {
     return res
       .status(400)
@@ -214,20 +244,41 @@ app.post('/urls/:id', (req, res) => {
   }
 });
 
-
 //delets selected URL from table of URLS
 app.post('/urls/:id/delete', (req, res) => {
+  const shortURL = req.params.shortURL; //? 
   const userID = req.session.userId;
   if (!userID) {
     res.status(401).send('Login or, registration required');
   } else {
-    const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       const deleteUrl = req.params.id;
       delete urlDatabase[deleteUrl];
+      //const currentPath = req.body.currentPath || '/urls';
       res.redirect('/urls');
     } else {
       res.status(403).send("You are not authorized to delete this entry.");
+    }
+  }
+});
+
+
+//Edit a logged in users URL on the urls_shows pg
+app.post('/urls/:id/edit', (req, res) => {
+  const userID = req.session.userId;
+  if (!userID) {
+    res.status(401).send('Login or, registration required ');
+  } else {
+    const shortURL = req.params.id;
+    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+      const editURL = req.body.longURL;
+      if (urlDatabase[editURL].longURL) {
+        res.redirect('/urls');
+      } else {
+        res
+          .status(404)
+          .send("I'm sorry the page you are trying to access is not here.");
+      }
     }
   }
 });
@@ -245,7 +296,7 @@ app.get('/urls/new', (req, res) => {
       urls: urlDatabase,
       user: users[userID],
       userEmail: userEmail,
-      renderEditDeleteButtons: false 
+      renderEditDeleteButtons: false
     };
     res.render('urls_new', templateVars);
   }
@@ -264,29 +315,14 @@ app.get('/urls/:id', (req, res) => {
         id: shortURL,
         longURL: urlDatabase[shortURL].longURL,
         user: user,
-        renderEditDeleteButtons: true
+        renderEditDeleteButtons: true,
+        currentPath: req.originalUrl
       };
       res.render('urls_show', templateVars);
     } else {
-      res.status(403).send('You are not authorized to access this URL!');
-    }
-  }
-});
-
-//retrieve  a specific URL to Edit on the urls_shows pg
-app.post('/urls/:id', (req, res) => {
-  const userID = req.session.userId;
-  if (!userID) {
-    res.status(401).send('Login or, registration required ');
-  } else {
-    const shortURL = req.params.id;
-    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const editURL = req.body.longURL;
-      if (urlDatabase[editURL].longURL) {
-        res.redirect('/urls');
-      } else {
-        res.status(404).send("I'm sorry the page you are trying to access is not here.");
-      }
+      res
+        .status(403)
+        .send('You are not authorized to access this URL!');
     }
   }
 });
@@ -298,19 +334,10 @@ app.get('/u/:id', (req, res) => {
     const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
   } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+    res
+      .status(404)
+      .send("I'm sorry the page you are trying to access is not here.");
   }
-});
-
-//link to redirect to the longURL
-app.get('/u/:shortURL', (req, res) => {
-  const shortURL = req.params.shortURL;
-  if (urlDatabase[shortURL]) {
-    return res.redirect(urlDatabase[shortURL].longURL);
-  }
-  return res
-  .status(404)
-  .send('URL not found');
 });
 
 //PAGE RENDERING
