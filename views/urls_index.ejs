@@ -37,7 +37,8 @@
           
               <!-- Edit form -->
               <td>
-                <form action="/urls/<%= shortURL %>/edit" method="POST">
+                <!-- Edit removed from action -->
+                <form action="/urls/<%= shortURL %>" method="GET">
                   <button type="submit" class="btn btn-success">Edit</button>
                 </form>
               </td>
