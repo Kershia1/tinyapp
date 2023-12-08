@@ -255,6 +255,8 @@ app.get('/urls/:id', (req, res) => {
   }
 });
 
+
+//possibly conflicting and ambiguous route
 //retrieve and allow any user to access a specific URL wether logged in or not
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
@@ -266,6 +268,7 @@ app.get('/u/:id', (req, res) => {
   }
 });
 
+/*
 //render the register route for users
 
       //duplicate route
@@ -285,6 +288,7 @@ app.get('/login', (req, res) => {
   };
   res.render('urls_login', templateVars);
 });
+*/
 
 //render urls index page to display all urls in database
 app.get('/urls', (req, res) => {
@@ -314,12 +318,12 @@ app.get('/:id', (req, res) => {
   }
 });
 
-//route to render index 
+/*/route to render index 
 
-      //duplicate route
+      //duplicate and unused route
 app.get('/index', (req, res) => {
   res.render('index');
-});
+}); */
 
 // sends a response with the url database sent as a json file 
 app.get("/urls.json", (req, res) => {
