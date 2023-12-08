@@ -199,6 +199,7 @@ app.post('/urls/:id/delete', (req, res) => {
   }
 });
 
+//option a
 app.get('/urls/:id/edit', (req, res) => {
   console.log('editing short url');
   const userID = req.session.userId;
@@ -212,6 +213,31 @@ app.get('/urls/:id/edit', (req, res) => {
        res.render('urls_new');
       } else {
         res.status(404).send("I'm sorry the page you are trying to access is not here.");
+    }
+  }
+});
+
+//option b
+// Edit a logged-in user's URL on the urls_shows page
+app.post('/urls/:id', (req, res) => {
+  const userID = req.session.userId;
+  
+  // Check if the user is logged in
+  if (!userID) {
+    res.status(401).send('Login or registration required');
+  } else {
+    const shortURL = req.params.id;
+    
+    // Check if the URL exists and belongs to the logged-in user
+    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
+      // Update the long URL with the new value from the form
+      const newLongURL = req.body.newLongURL;
+      urlDatabase[shortURL].longURL = newLongURL;
+      
+      // Redirect to the urls_show page for the updated URL
+      res.redirect(`/urls/${shortURL}`);
+    } else {
+      res.status(404).send("I'm sorry, the page you are trying to access is not here.");
     }
   }
 });
