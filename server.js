@@ -201,16 +201,18 @@ app.post('/urls/:id/delete', (req, res) => {
 
 //option a
 app.get('/urls/:id/edit', (req, res) => {
-  console.log('editing short url');
   const userID = req.session.userId;
   if (!userID) {
     res.status(401).send('Login or, registration required ');
   } else {
     const shortURL = req.params.id;
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      urlDatabase[shortURL].longURL = req.body.longURL;
-      console.log('redirecting to: ', shortURL);
-       res.render('urls_new');
+      //urlDatabase[shortURL].longURL = req.body.longURL;
+      const templateVars = {
+        id: shortURL,
+        longURL: urlDatabase[shortURL].longURL,
+      }
+       res.render('urls_edit', templateVars);
       } else {
         res.status(404).send("I'm sorry the page you are trying to access is not here.");
     }
