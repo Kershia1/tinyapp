@@ -267,6 +267,8 @@ app.get('/u/:id', (req, res) => {
 });
 
 //render the register route for users
+
+      //duplicate route
 app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.session.userId],
@@ -275,6 +277,8 @@ app.get('/register', (req, res) => {
 });
 
 //render the login route for users 
+
+      //duplicate route
 app.get('/login', (req, res) => {
   const templateVars = {
     user: users[req.session.userId],
@@ -311,6 +315,8 @@ app.get('/:id', (req, res) => {
 });
 
 //route to render index 
+
+      //duplicate route
 app.get('/index', (req, res) => {
   res.render('index');
 });
