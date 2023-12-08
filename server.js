@@ -199,7 +199,6 @@ app.post('/urls/:id/delete', (req, res) => {
   }
 });
 
-
 app.get('/urls/:id/edit', (req, res) => {
   console.log('editing short url');
   const userID = req.session.userId;
@@ -210,7 +209,6 @@ app.get('/urls/:id/edit', (req, res) => {
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       urlDatabase[shortURL].longURL = req.body.longURL;
       console.log('redirecting to: ', shortURL);
-       //res.redirect(`/urls/${shortURL}`); // Redirect to the updated URL was missing
        res.render('urls_new');
       } else {
         res.status(404).send("I'm sorry the page you are trying to access is not here.");
@@ -218,26 +216,6 @@ app.get('/urls/:id/edit', (req, res) => {
   }
 });
 
-/*
-//Edit a logged in users URL on the urls_shows pg
-app.post('/urls/:id/edit', (req, res) => {
-  console.log('editing short url');
-  const userID = req.session.userId;
-  if (!userID) {
-    res.status(401).send('Login or, registration required ');
-  } else {
-    const shortURL = req.params.id;
-    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      urlDatabase[shortURL].longURL = req.body.longURL;
-      console.log('redirecting to: ', shortURL);
-       //res.redirect(`/urls/${shortURL}`); // Redirect to the updated URL was missing
-       res.reditect('urls_new');
-      } else {
-        res.status(404).send("I'm sorry the page you are trying to access is not here.");
-    }
-  }
-});
-*/
 //render new urls page
 app.get('/urls/new', (req, res) => {
   const userID = req.session.userId;
