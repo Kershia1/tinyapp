@@ -268,28 +268,6 @@ app.get('/u/:id', (req, res) => {
   }
 });
 
-/*
-//render the register route for users
-
-      //duplicate route
-app.get('/register', (req, res) => {
-  const templateVars = {
-    user: users[req.session.userId],
-  };
-  res.render('urls_register', templateVars);
-});
-
-//render the login route for users 
-
-      //duplicate route
-app.get('/login', (req, res) => {
-  const templateVars = {
-    user: users[req.session.userId],
-  };
-  res.render('urls_login', templateVars);
-});
-*/
-
 //render urls index page to display all urls in database
 app.get('/urls', (req, res) => {
   const userID = req.session.userId;
@@ -317,13 +295,6 @@ app.get('/:id', (req, res) => {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
 });
-
-/*/route to render index 
-
-      //duplicate and unused route
-app.get('/index', (req, res) => {
-  res.render('index');
-}); */
 
 // sends a response with the url database sent as a json file 
 app.get("/urls.json", (req, res) => {
