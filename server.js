@@ -231,11 +231,12 @@ app.post('/urls/:id', (req, res) => {
     const shortURL = req.params.id;
     
     // Check if the URL exists and belongs to the logged-in user
+    console.log(`checkign url parmeters: ${shortURL}`);
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       // Update the long URL with the new value from the form
       const newLongURL = req.body.newLongURL;
       urlDatabase[shortURL].longURL = newLongURL;
-      
+      console.log(`redirecting to: , urlDatabase `);
       // Redirect to the urls_show page for the updated URL
       res.redirect(`/urls/${shortURL}`);
     } else {
