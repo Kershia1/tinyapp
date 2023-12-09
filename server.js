@@ -209,7 +209,6 @@ app.get('/urls/:id/edit', (req, res) => {
 
     
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      //urlDatabase[shortURL].longURL = req.body.longURL;
       const templateVars = {
         id: shortURL,
         longURL: urlDatabase[shortURL].longURL
@@ -223,11 +222,8 @@ app.get('/urls/:id/edit', (req, res) => {
 
 // Edit a logged-in user's URL on the urls_shows page
 app.post('/urls/:id/edit', (req, res) => {
-  console.log(`req.body for editing: ${req.body}`);
   const userID = req.session.userId;
-  // Check if the user is logged in
   if (!userID) {
-    console.log('Checking if user is logged in');
     res.status(401).send('Login or registration required');
   } else {
     const shortURL = req.params.id;
@@ -303,7 +299,6 @@ app.get('/u/:id', (req, res) => {
 });
 
 //render urls new page to create a new shortURL
-  //not a duplicate route need to redirect short urls 
 app.get('/:id', (req, res) => {
   const shortURL = req.params.id;
 
