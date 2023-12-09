@@ -18,7 +18,7 @@
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <form action="/urls/<%= id %>/edit" method = "POST">
+       <form action="/urls/<%= id %>/edit" method = "POST">
           <div class="form-group">
             <label for="longURL">Long URL</label>
             <input
@@ -29,8 +29,9 @@
               placeholder="http://"
             />
             <button type="submit" class="btn btn-primary">Edit</button>
+            <p>from from urls_show</p>
           </div>
-        </form>
+        </form> 
         </div>
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">

@@ -199,45 +199,48 @@ app.post('/urls/:id/delete', (req, res) => {
   }
 });
 
-//option a
+//make the shortURL editable
 app.get('/urls/:id/edit', (req, res) => {
   const userID = req.session.userId;
   if (!userID) {
     res.status(401).send('Login or, registration required ');
   } else {
     const shortURL = req.params.id;
+
+    
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
       //urlDatabase[shortURL].longURL = req.body.longURL;
       const templateVars = {
         id: shortURL,
-        longURL: urlDatabase[shortURL].longURL,
-      }
-       res.render('urls_edit', templateVars);
-      } else {
-        res.status(404).send("I'm sorry the page you are trying to access is not here.");
+        longURL: urlDatabase[shortURL].longURL
+      };
+      res.render('urls_edit', templateVars);
+    } else {
+      res.status(404).send("I'm sorry the page you are trying to access is not here.");
     }
   }
 });
 
-//option b
 // Edit a logged-in user's URL on the urls_shows page
-app.post('/urls/:id', (req, res) => {
+app.post('/urls/:id/edit', (req, res) => {
+  console.log(`req.body for editing: ${req.body}`);
   const userID = req.session.userId;
-  
   // Check if the user is logged in
   if (!userID) {
+    console.log('Checking if user is logged in');
     res.status(401).send('Login or registration required');
   } else {
     const shortURL = req.params.id;
-    
-    // Check if the URL exists and belongs to the logged-in user
-    console.log(`checkign url parmeters: ${shortURL}`);
+    console.log(`checking url parmeters: ${shortURL}`);
+    console.log(`urlDatabase[${shortURL}].userID: ${urlDatabase[shortURL].userID}`);
+    console.log(`userID: ${userID}`);
+
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      // Update the long URL with the new value from the form
       const newLongURL = req.body.newLongURL;
       urlDatabase[shortURL].longURL = newLongURL;
-      console.log(`redirecting to: , urlDatabase `);
-      // Redirect to the urls_show page for the updated URL
+      //console.log(`redirecting to: , urlDatabase `);
+      //res.redirect('/urls_index');
+      //res.redirect(`/urls/:id`);
       res.redirect(`/urls/${shortURL}`);
     } else {
       res.status(404).send("I'm sorry, the page you are trying to access is not here.");
@@ -284,19 +287,46 @@ app.get('/urls/:id', (req, res) => {
   }
 });
 
-//possibly conflicting and ambiguous route?
 //retrieve and allow any user to access a specific URL wether logged in or not
 app.get('/u/:id', (req, res) => {
   const shortURL = req.params.id;
+  let longURL;
+  if (urlDatabase[shortURL]) {
+  longURL = urlDatabase[shortURL].longURL;
+    console.log('longURL redirection:', longURL);
+    res.redirect(longURL);
+  } else {
+    console.log('longURL redirection FAILED:', longURL);
+    res.status(404).send("I'm sorry the page you are trying to access is not here.");
+  }
+});
+
+//render urls new page to create a new shortURL
+  //not a duplicate route need to redirect short urls 
+app.get('/:id', (req, res) => {
+  const shortURL = req.params.id;
+
   if (urlDatabase[shortURL]) {
     const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
   } else {
     res.status(404).send("I'm sorry the page you are trying to access is not here.");
   }
+}); 
+
+// sends a response with the url database sent as a json file 
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
+//listen on port 8080
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
+
+/*
 //render urls index page to display all urls in database
+  //duplicate route
 app.get('/urls', (req, res) => {
   const userID = req.session.userId;
 
@@ -311,25 +341,21 @@ app.get('/urls', (req, res) => {
   };
   res.render("urls_index", templateVars);
 });
+*/
 
-//render urls new page to create a new shortURL
-app.get('/:id', (req, res) => {
-  const shortURL = req.params.id;
 
-  if (urlDatabase[shortURL]) {
-    const longURL = urlDatabase[shortURL].longURL;
-    res.redirect(longURL);
-  } else {
-    res.status(404).send("I'm sorry the page you are trying to access is not here.");
-  }
-});
+      // //creating a new short url to match the new long url
+      // const newShortURL = generateRandomString(6);
 
-// sends a response with the url database sent as a json file 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+      // //add new shortrend to database
+      // console.log(`new short url: ${newShortURL}`);
+      // urlDatabase[newShortURL] = {
+      //   shortURL: newShortURL,
+      //   longURL: newLongURL,
+      //   userID: userID
+      // };
+// console.log(`delete old short url: ${shortURL}`)
+//       //delete old short url from database
+//       delete urlDatabase[shortURL];
 
-//listen on port 8080
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+      //urlDatabase[shortURL].longURL = newLongURL; not sure if still necessary?
