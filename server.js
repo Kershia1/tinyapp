@@ -238,7 +238,7 @@ app.post('/urls/:id/edit', (req, res) => {
           newLongURL = `http://${newLongURL}`;
     }
       urlDatabase[shortURL].longURL = newLongURL;
-      res.redirect(`/urls/${shortURL}`);
+      res.redirect('/urls');
     } else {
       res.status(404).send("I'm sorry, the page you are trying to access is not here.");
     }
@@ -319,39 +319,3 @@ app.get("/urls.json", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-/*
-//render urls index page to display all urls in database
-  //duplicate route
-app.get('/urls', (req, res) => {
-  const userID = req.session.userId;
-
-  if (!userID) {
-    res.status(401).send('Login needed');
-  }
-  const user = users[userID];
-  const userURLS = userSpecificURLS(userID);
-  const templateVars = {
-    urls: userURLS,
-    user: user
-  };
-  res.render("urls_index", templateVars);
-});
-*/
-
-
-      // //creating a new short url to match the new long url
-      // const newShortURL = generateRandomString(6);
-
-      // //add new shortrend to database
-      // console.log(`new short url: ${newShortURL}`);
-      // urlDatabase[newShortURL] = {
-      //   shortURL: newShortURL,
-      //   longURL: newLongURL,
-      //   userID: userID
-      // };
-// console.log(`delete old short url: ${shortURL}`)
-//       //delete old short url from database
-//       delete urlDatabase[shortURL];
-
-      //urlDatabase[shortURL].longURL = newLongURL; not sure if still necessary?
