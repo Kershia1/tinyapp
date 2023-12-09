@@ -236,11 +236,12 @@ app.post('/urls/:id/edit', (req, res) => {
     console.log(`userID: ${userID}`);
 
     if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userID) {
-      const newLongURL = req.body.newLongURL;
+      let newLongURL = req.body.newLongURL;
+
+        if(!newLongURL.startsWith('http://') && !newLongURL.startsWith('https://')) {
+          newLongURL = `http://${newLongURL}`;
+    }
       urlDatabase[shortURL].longURL = newLongURL;
-      //console.log(`redirecting to: , urlDatabase `);
-      //res.redirect('/urls_index');
-      //res.redirect(`/urls/:id`);
       res.redirect(`/urls/${shortURL}`);
     } else {
       res.status(404).send("I'm sorry, the page you are trying to access is not here.");
