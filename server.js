@@ -28,6 +28,7 @@ app.use(cookieSession({
   keys: ['suzie'],
   maxAge: 24 * 60 * 60 * 1000
 }));
+
 app.use("/static", express.static("public"));
 
 //Template used
@@ -84,20 +85,20 @@ app.post('/urls_login', (req, res) => {
   });
 });
 
-app.post('/logout', (req, res) => {
-  delete req.session.userId;
+app.post ('/logout', (req, res) => {
+  req.session = null;
   res.redirect('/urls_login');
 });
 
 //Delete user cookie session when the Sign-out button is selected
-app.post ('/logout', (req, res) => {
-  req.session.destroy(error => {
-    if(error) {
-      return console.log('Error while destroying session: ',error);
-    }
-    res.redirect('/urls_login');
-  });
-});
+// app.post ('/logout', (req, res) => {
+//   req.session.destroy(error => {
+//     if(error) {
+//       return console.log('Error while destroying session: ',error);
+//     }
+//     res.redirect('/urls_login');
+//   });
+// });
 
 // Render Registration Page, register new user
 app.get('/register', (req, res) => {
