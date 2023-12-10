@@ -12,7 +12,6 @@ const PORT = 8080; // default port 8080
 const {
   emailExists,
   findUserByID,
-  getUserByEmail,
   generateRandomString,
   userSpecificURLS
 } = require('./helpers');
@@ -62,31 +61,42 @@ app.get('/urls_login', (req, res) => {
 
 app.post('/urls_login', (req, res) => {
   const { userEmail, userPassword } = req.body;
-  const user = getUserByEmail(userEmail);
+  console.log('userEmail:', userEmail);
 
-  if (!user) {
+  let foundUser = null;
+  for (const userId in users) {
+    if (users[userId].email === userEmail) {
+      foundUser = users[userId];
+      break;
+    }
+  }
+
+  if (!foundUser) {
     return res.status(400).send('We could not find a user with that email address.');
   }
 
-  bcrypt.compare(userPassword, user.password, (err, result) => {
-    if (!result) {
+  bcrypt.compare(userPassword, foundUser.password, (err, result) => {
+    if (err || !result) {
       return res.status(400).send('You have entered an incorrect password.');
     }
-    req.session.userId = user.id;
+    req.session.userId = foundUser.id;
     res.redirect('/urls');
   });
 });
 
-//Sign-out user when the Sign-out button is selected
 app.post('/logout', (req, res) => {
   delete req.session.userId;
   res.redirect('/urls_login');
 });
 
-//Delete email session when the Sign-out button is selected
-app.get('/logout', (req, res) => {
-  req.session.userEmail = null;
-  res.redirect('/urls');
+//Delete user cookie session when the Sign-out button is selected
+app.post ('/logout', (req, res) => {
+  req.session.destroy(error => {
+    if(error) {
+      return console.log('Error while destroying session: ',error);
+    }
+    res.redirect('/urls_login');
+  });
 });
 
 // Render Registration Page, register new user
@@ -111,6 +121,7 @@ app.post('/register', (req, res) => {
   const saltRounds = 10;
 
   if (!userEmail || !password || emailExists(userEmail, users)) {
+    //check logic to ensure passwords are not being chaecked against other e-mails
     return res.status(400).send('An incorrect e-mail or password has been entered.');
   }
 

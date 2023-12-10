@@ -27,19 +27,6 @@ function userSpecificURLS(id, urlDatabase) {
   return usersURLS;
 };
 
-//getUserByEmail
-////////////////////
-const getUserByEmail = (email, users) => {
-  for (const userId in users) {
-    const user = users[userId];
-    if (email === user.email) {
-      return user;
-    }
-  }
-  return null;
-};
-
-
 //findUserByID
 const findUserByID = (id, users) => {
   const user = users[id];
@@ -48,6 +35,8 @@ const findUserByID = (id, users) => {
   }
   return null;
 };
+
+//foundUser
 
 //emailExists
 const emailExists = (emailProvided, users) => {
@@ -58,10 +47,21 @@ const emailExists = (emailProvided, users) => {
   }
 };
 
+//getUserByEmail
+//saving to try re-implementing with login handler
+////////////////////
+const getUserByEmail = (email, users) => {
+  for (const userId in users) {
+    const user = users[userId];
+    if (email === user.email) {
+      return user;
+    }
+  }
+  return null;
+};
 module.exports = {
    emailExists,
    findUserByID,
-   getUserByEmail,
    generateRandomString,
    userSpecificURLS
   };
